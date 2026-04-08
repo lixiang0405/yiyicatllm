@@ -1,0 +1,342 @@
+"""
+SFT 训练后模型评测脚本
+评测维度:
+  1. 自动指标: BLEU、ROUGE-L、关键词命中率
+  2. 生成质量: 对测试集生成回答，人工/自动评分
+  3. 对比评测: 微调前 vs 微调后的回答对比
+
+用法:
+  python train/evaluate_model.py \
+      --base-model Qwen/Qwen2.5-7B \
+      --lora-adapter outputs/ustc-qa-lora \
+      --test-data data/qa_pairs.json \
+      --output outputs/eval_report.json
+"""
+
+import argparse
+import json
+import re
+import time
+from pathlib import Path
+from typing import List, Dict
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+
+
+def load_model(base_model_path, lora_adapter_path=None):
+    """加载模型（支持基座模型和 LoRA 模型）"""
+    tokenizer = AutoTokenizer.from_pretrained(
+        base_model_path, trust_remote_code=True
+    )
+
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model_path,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+        trust_remote_code=True,
+    )
+
+    if lora_adapter_path:
+        model = PeftModel.from_pretrained(model, lora_adapter_path)
+        model = model.merge_and_unload()
+
+    model.eval()
+    return model, tokenizer
+
+
+def generate_answer(model, tokenizer, question, max_new_tokens=512):
+    """生成单个回答"""
+    messages = [
+        {"role": "system", "content": "你是中科大智能问答助手，请详细、准确地回答用户的问题。"},
+        {"role": "user", "content": question},
+    ]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+
+    start_time = time.perf_counter()
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            temperature=0.7,
+            top_p=0.9,
+            do_sample=True,
+        )
+    generation_time = time.perf_counter() - start_time
+
+    generated_ids = outputs[0][inputs["input_ids"].shape[1]:]
+    answer = tokenizer.decode(generated_ids, skip_special_tokens=True)
+    output_tokens = len(generated_ids)
+
+    return answer, generation_time, output_tokens
+
+
+def compute_rouge_l(reference, hypothesis):
+    """计算 ROUGE-L F1 分数（基于最长公共子序列）"""
+    ref_chars = list(reference)
+    hyp_chars = list(hypothesis)
+
+    if not ref_chars or not hyp_chars:
+        return 0.0
+
+    lcs_length = _lcs_length(ref_chars, hyp_chars)
+    precision = lcs_length / len(hyp_chars) if hyp_chars else 0
+    recall = lcs_length / len(ref_chars) if ref_chars else 0
+
+    if precision + recall == 0:
+        return 0.0
+    return round(2 * precision * recall / (precision + recall), 4)
+
+
+def _lcs_length(seq_a, seq_b):
+    """计算两个序列的最长公共子序列长度"""
+    len_a, len_b = len(seq_a), len(seq_b)
+    # 空间优化：只保留两行
+    prev = [0] * (len_b + 1)
+    curr = [0] * (len_b + 1)
+    for i in range(1, len_a + 1):
+        for j in range(1, len_b + 1):
+            if seq_a[i - 1] == seq_b[j - 1]:
+                curr[j] = prev[j - 1] + 1
+            else:
+                curr[j] = max(prev[j], curr[j - 1])
+        prev, curr = curr, [0] * (len_b + 1)
+    return prev[len_b]
+
+
+def compute_keyword_hit_rate(question, reference, generated):
+    """计算关键词命中率：参考答案中的关键词在生成答案中出现的比例"""
+    ustc_keywords = [
+        "中科大", "中国科学技术大学", "USTC", "合肥",
+        "少年班", "潘建伟", "量子", "科大讯飞",
+        "中科院", "国家实验室", "院士",
+        "研究", "学科", "专业", "实验室",
+        "博士", "硕士", "本科", "教授",
+    ]
+
+    # 从参考答案中提取出现的关键词
+    ref_keywords = [kw for kw in ustc_keywords if kw in reference]
+    if not ref_keywords:
+        return 1.0
+
+    hit_count = sum(1 for kw in ref_keywords if kw in generated)
+    return round(hit_count / len(ref_keywords), 4)
+
+
+def compute_length_ratio(reference, generated):
+    """计算生成长度与参考长度的比值"""
+    ref_len = len(reference)
+    gen_len = len(generated)
+    if ref_len == 0:
+        return 0.0
+    return round(gen_len / ref_len, 2)
+
+
+def compute_format_score(generated):
+    """评估生成回答的格式质量（0-1）"""
+    score = 0.0
+    max_score = 3.0
+
+    # 有编号列表
+    numbered = re.findall(r'(?:^|\n)\s*(?:\d+[.、]|[一二三四五六七八九十]+[、.])', generated)
+    if len(numbered) >= 2:
+        score += 1.0
+
+    # 有多段落
+    paragraphs = [p.strip() for p in generated.split("\n") if p.strip()]
+    if len(paragraphs) >= 3:
+        score += 1.0
+
+    # 以完整标点结尾
+    if generated.strip() and generated.strip()[-1] in "。！？.!?)）":
+        score += 1.0
+
+    return round(score / max_score, 2)
+
+
+def evaluate_model(
+    model,
+    tokenizer,
+    test_data: List[Dict],
+    num_samples: int = 50,
+    model_label: str = "lora",
+):
+    """对模型进行全面评测"""
+    # 采样测试数据
+    import random
+    random.seed(42)
+    samples = random.sample(test_data, min(num_samples, len(test_data)))
+
+    results = []
+    total_tokens = 0
+    total_generation_time = 0.0
+
+    print(f"\n  评测 [{model_label}] 模型，共 {len(samples)} 条测试数据...")
+
+    for i, item in enumerate(samples):
+        question = item["instruction"]
+        reference = item["output"]
+
+        generated, gen_time, output_tokens = generate_answer(model, tokenizer, question)
+        total_tokens += output_tokens
+        total_generation_time += gen_time
+
+        rouge_l = compute_rouge_l(reference, generated)
+        keyword_hit = compute_keyword_hit_rate(question, reference, generated)
+        length_ratio = compute_length_ratio(reference, generated)
+        format_score = compute_format_score(generated)
+
+        result = {
+            "question": question,
+            "reference": reference[:200],
+            "generated": generated[:200],
+            "rouge_l": rouge_l,
+            "keyword_hit_rate": keyword_hit,
+            "length_ratio": length_ratio,
+            "format_score": format_score,
+            "generation_time_seconds": round(gen_time, 3),
+            "output_tokens": output_tokens,
+        }
+        results.append(result)
+
+        if (i + 1) % 10 == 0:
+            print(f"    进度: {i+1}/{len(samples)}")
+
+    # 汇总指标
+    summary = {
+        "model_label": model_label,
+        "num_samples": len(results),
+        "avg_rouge_l": round(sum(r["rouge_l"] for r in results) / len(results), 4),
+        "avg_keyword_hit_rate": round(sum(r["keyword_hit_rate"] for r in results) / len(results), 4),
+        "avg_length_ratio": round(sum(r["length_ratio"] for r in results) / len(results), 2),
+        "avg_format_score": round(sum(r["format_score"] for r in results) / len(results), 2),
+        "avg_generation_time_seconds": round(total_generation_time / len(results), 3),
+        "avg_tokens_per_second": round(total_tokens / total_generation_time, 1) if total_generation_time > 0 else 0,
+        "total_output_tokens": total_tokens,
+    }
+
+    return summary, results
+
+
+def run_comparison(base_model_path, lora_adapter_path, test_data, num_samples):
+    """对比评测：基座模型 vs LoRA 微调模型"""
+    all_summaries = {}
+    all_details = {}
+
+    # 评测 LoRA 微调模型
+    print("\n[1/2] 加载 LoRA 微调模型...")
+    lora_model, tokenizer = load_model(base_model_path, lora_adapter_path)
+    lora_summary, lora_details = evaluate_model(lora_model, tokenizer, test_data, num_samples, "lora_finetuned")
+    all_summaries["lora_finetuned"] = lora_summary
+    all_details["lora_finetuned"] = lora_details
+
+    # 释放显存
+    del lora_model
+    torch.cuda.empty_cache()
+
+    # 评测基座模型
+    print("\n[2/2] 加载基座模型 (对比基准)...")
+    base_model, tokenizer = load_model(base_model_path, lora_adapter_path=None)
+    base_summary, base_details = evaluate_model(base_model, tokenizer, test_data, num_samples, "base_model")
+    all_summaries["base_model"] = base_summary
+    all_details["base_model"] = base_details
+
+    del base_model
+    torch.cuda.empty_cache()
+
+    return all_summaries, all_details
+
+
+def print_comparison(summaries):
+    """打印对比结果"""
+    print(f"\n{'='*65}")
+    print(f"  模型评测对比报告")
+    print(f"{'='*65}")
+
+    header = f"  {'指标':<25} {'基座模型':>15} {'LoRA微调':>15}"
+    print(header)
+    print(f"  {'-'*55}")
+
+    base = summaries.get("base_model", {})
+    lora = summaries.get("lora_finetuned", {})
+
+    metrics = [
+        ("ROUGE-L", "avg_rouge_l", True),
+        ("关键词命中率", "avg_keyword_hit_rate", True),
+        ("长度比 (生成/参考)", "avg_length_ratio", False),
+        ("格式质量分", "avg_format_score", True),
+        ("平均生成速度 (tok/s)", "avg_tokens_per_second", False),
+        ("平均生成耗时 (s)", "avg_generation_time_seconds", False),
+    ]
+
+    for label, key, higher_is_better in metrics:
+        base_val = base.get(key, 0)
+        lora_val = lora.get(key, 0)
+
+        if higher_is_better and lora_val > base_val:
+            indicator = " ↑"
+        elif higher_is_better and lora_val < base_val:
+            indicator = " ↓"
+        else:
+            indicator = ""
+
+        print(f"  {label:<25} {base_val:>15} {lora_val:>13}{indicator}")
+
+    print(f"{'='*65}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="SFT 训练后模型评测")
+    parser.add_argument("--base-model", type=str, default="Qwen/Qwen2.5-7B", help="基座模型路径")
+    parser.add_argument("--lora-adapter", type=str, default="outputs/ustc-qa-lora", help="LoRA 适配器路径")
+    parser.add_argument("--test-data", type=str, default="data/qa_pairs.json", help="测试数据路径")
+    parser.add_argument("--num-samples", type=int, default=50, help="评测样本数")
+    parser.add_argument("--output", type=str, default="outputs/eval_report.json", help="评测报告输出路径")
+    parser.add_argument("--skip-base", action="store_true", help="跳过基座模型评测（省时间）")
+    args = parser.parse_args()
+
+    # 加载测试数据
+    print("加载测试数据...")
+    with open(args.test_data, "r", encoding="utf-8") as f:
+        test_data = json.load(f)
+    print(f"  测试数据: {len(test_data)} 条")
+
+    if args.skip_base:
+        # 只评测 LoRA 模型
+        print("\n加载 LoRA 微调模型...")
+        model, tokenizer = load_model(args.base_model, args.lora_adapter)
+        summary, details = evaluate_model(model, tokenizer, test_data, args.num_samples, "lora_finetuned")
+        summaries = {"lora_finetuned": summary}
+        all_details = {"lora_finetuned": details}
+    else:
+        # 对比评测
+        summaries, all_details = run_comparison(
+            args.base_model, args.lora_adapter, test_data, args.num_samples
+        )
+        print_comparison(summaries)
+
+    # 保存报告
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    report = {
+        "config": {
+            "base_model": args.base_model,
+            "lora_adapter": args.lora_adapter,
+            "test_data": args.test_data,
+            "num_samples": args.num_samples,
+        },
+        "summaries": summaries,
+        "sample_details": {k: v[:10] for k, v in all_details.items()},
+    }
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
+    print(f"\n评测报告已保存至: {output_path}")
+
+
+if __name__ == "__main__":
+    main()

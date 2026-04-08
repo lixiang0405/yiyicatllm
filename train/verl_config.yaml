@@ -1,0 +1,110 @@
+# ============================================
+# veRL GRPO 训练配置
+# 模型: SFT/DPO 微调后的 Qwen2.5-7B
+# 方法: GRPO (Group Relative Policy Optimization)
+# ============================================
+#
+# GRPO 原理 (DeepSeek-R1 使用的方法):
+#   1. 对每个 prompt 采样 G 个回答 (rollout)
+#   2. 用 Reward Function 对每个回答打分
+#   3. 用组内平均 reward 作为 baseline (替代 PPO 的 Critic)
+#   4. 计算优势函数: A_i = (r_i - mean(r)) / std(r)
+#   5. 用 PPO-clip 目标更新 Actor
+#
+# 与 PPO 的区别:
+#   - 不需要 Critic Model → 省 ~25% GPU 显存
+#   - 用组内相对排名 → 训练更稳定
+#   - 实现更简单 → 调参更容易
+#
+# veRL 架构:
+#   Actor (可训练) ──→ rollout 生成回答
+#   Reference (冻结) ──→ 计算 KL 散度
+#   Reward (规则函数) ──→ 对回答打分
+#   注意: GRPO 不需要 Critic!
+
+# ============================================
+# Actor + Rollout + Reference 配置
+# ============================================
+actor_rollout_ref:
+  model:
+    path: outputs/ustc-qa-merged  # SFT/DPO 后的模型路径 (命令行可覆盖)
+    tokenizer_path: null          # 默认与 model path 相同
+
+  actor:
+    strategy: fsdp                # 并行策略: fsdp (推荐) 或 megatron
+    ppo_mini_batch_size: 4
+    ppo_micro_batch_size: 2
+    ppo_epochs: 1                 # 每批数据的 PPO 更新轮数
+    clip_ratio: 0.2               # PPO clip 比率
+    entropy_coeff: 0.01           # 熵正则化系数，鼓励探索
+    kl_coeff: 0.1                 # KL 散度惩罚系数
+    max_grad_norm: 1.0
+
+    # 优化器
+    optim:
+      lr: 1.0e-6                  # GRPO 学习率通常很小
+      weight_decay: 0.01
+      warmup_steps: 10
+
+    # LoRA 配置 (可选，减少显存)
+    # lora:
+    #   rank: 16
+    #   alpha: 32
+    #   target_modules: all
+
+  rollout:
+    name: vllm                    # 使用 vLLM 做 rollout (高效)
+    tensor_model_parallel_size: 1 # rollout 的 TP 大小
+    gpu_memory_utilization: 0.4   # rollout 占用的 GPU 显存比例
+    max_num_seqs: 16              # 最大并发序列数
+
+    # 生成参数
+    temperature: 0.7              # 采样温度
+    top_p: 0.9
+    max_new_tokens: 512           # 最大生成长度
+    n: 4                          # 每个 prompt 采样 G=4 个回答 (GRPO 核心参数)
+
+  ref:
+    strategy: fsdp
+    log_prob_micro_batch_size: 4
+
+# ============================================
+# Reward 配置
+# ============================================
+reward_model:
+  # 使用自定义规则奖励函数 (不需要 Reward Model)
+  enable: false
+
+custom_reward:
+  enable: true
+  path: train/reward_function.py  # 自定义奖励函数路径
+  function_name: reward_function  # 入口函数名
+
+# ============================================
+# 数据配置
+# ============================================
+data:
+  train_files: data/grpo_prompts.json
+  max_prompt_length: 512
+  max_response_length: 512
+
+# ============================================
+# Trainer 配置
+# ============================================
+trainer:
+  total_epochs: 3                 # 总训练轮数
+  save_freq: 50                   # 每 50 步保存一次
+  test_freq: 25                   # 每 25 步测试一次
+  project_name: ustc-qa-grpo
+  experiment_name: grpo-run
+  default_local_dir: outputs/ustc-qa-grpo
+  n_gpus_per_node: 1              # 每节点 GPU 数 (命令行可覆盖)
+
+# ============================================
+# GRPO 特有配置
+# ============================================
+algorithm:
+  name: grpo                      # 使用 GRPO 算法
+  gamma: 1.0                      # 折扣因子
+  lam: 1.0                        # GAE lambda
+  adv_estimator: grpo             # 优势估计方法: grpo (组内相对)

@@ -1,0 +1,76 @@
+# ============================================
+# LLaMA-Factory DPO 偏好对齐训练配置
+# 模型: SFT 微调后的 Qwen2.5-7B
+# 方法: DPO (Direct Preference Optimization)
+# ============================================
+#
+# DPO 原理:
+#   传统 RLHF (PPO) 需要 4 个模型: Actor, Critic, Reward, Reference
+#   DPO 直接用偏好数据优化策略，只需要 2 个模型: Policy, Reference
+#
+#   DPO Loss:
+#     L = -log(sigmoid(beta * (log(pi(chosen)/ref(chosen)) - log(pi(rejected)/ref(rejected)))))
+#
+#   其中 beta 控制偏好强度，pi 是当前策略，ref 是参考策略 (SFT 模型)
+#
+# 训练流程:
+#   1. 先用 SFT 微调基座模型 (train_lora.yaml)
+#   2. 再用 DPO 在 SFT 模型基础上做偏好对齐 (本配置)
+
+### 模型配置
+# 使用 SFT 微调后的模型作为起点
+model_name_or_path: Qwen/Qwen2.5-7B
+adapter_name_or_path: outputs/ustc-qa-lora
+trust_remote_code: true
+
+### 训练方法
+stage: dpo
+do_train: true
+finetuning_type: lora
+
+### DPO 特有配置
+pref_beta: 0.1          # DPO 的 beta 参数，控制偏好强度 (越大越保守)
+pref_loss: sigmoid       # DPO loss 类型: sigmoid (原始 DPO)
+
+### LoRA 配置 (在 SFT LoRA 基础上继续训练)
+lora_rank: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target: all
+
+### 数据配置
+# 注意: 需要在 LLaMA-Factory/data/dataset_info.json 中注册偏好数据集
+# 添加: "ustc_qa_preference": {
+#   "file_name": "/path/to/yiyicat-llm/data/preference_data.json",
+#   "ranking": true,
+#   "columns": {"prompt": "instruction", "query": "input", "chosen": "chosen", "rejected": "rejected"}
+# }
+dataset: ustc_qa_preference
+template: qwen
+cutoff_len: 2048
+
+### 训练超参数
+per_device_train_batch_size: 1       # DPO 需要同时加载 chosen+rejected，显存翻倍，用1更安全
+gradient_accumulation_steps: 8       # 有效batch_size = 1 × 8 × 2卡 = 16
+learning_rate: 5.0e-5
+num_train_epochs: 2
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+max_grad_norm: 1.0
+
+### 混合精度
+bf16: true
+
+### DeepSpeed (可选，小数据集单卡即可)
+# deepspeed: train/ds_config_zero2.json
+
+### 输出配置
+output_dir: outputs/ustc-qa-dpo
+logging_steps: 5
+save_steps: 50
+save_total_limit: 3
+
+### 其他
+overwrite_output_dir: true
+report_to: none
+seed: 42
