@@ -1,9 +1,11 @@
 """
 SFT 训练后模型评测脚本
 评测维度:
-  1. 自动指标: BLEU、ROUGE-L、关键词命中率
-  2. 生成质量: 对测试集生成回答，人工/自动评分
-  3. 对比评测: 微调前 vs 微调后的回答对比
+  1. 文本重叠: ROUGE-L（词级别 bigram，适合中文长文本）
+  2. 领域知识: 关键词命中率（中科大软件学院垂直领域词库）
+  3. 事实准确: 事实命中率（URL/数字/机构等关键实体）
+  4. 生成质量: 长度合理性、格式质量分
+  5. 对比评测: 微调前 vs 微调后（贪心解码，结果可复现）
 
 用法:
   python train/evaluate_model.py \
@@ -12,6 +14,11 @@ SFT 训练后模型评测脚本
       --test-data data/qa_pairs.json \
       --output outputs/eval_report.json
 """
+
+# 离线模式：必须在 import transformers/huggingface_hub 之前设置
+import os
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 import argparse
 import json
@@ -24,18 +31,18 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
-
 def load_model(base_model_path, lora_adapter_path=None):
-    """加载模型（支持基座模型和 LoRA 模型）"""
+    """加载模型（支持基座模型和 LoRA 模型，离线模式）"""
     tokenizer = AutoTokenizer.from_pretrained(
-        base_model_path, trust_remote_code=True
+        base_model_path, trust_remote_code=True, local_files_only=True
     )
 
     model = AutoModelForCausalLM.from_pretrained(
         base_model_path,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True,
+        local_files_only=True,
     )
 
     if lora_adapter_path:
@@ -46,7 +53,7 @@ def load_model(base_model_path, lora_adapter_path=None):
     return model, tokenizer
 
 
-def generate_answer(model, tokenizer, question, max_new_tokens=512):
+def generate_answer(model, tokenizer, question, max_new_tokens=1024):
     """生成单个回答"""
     messages = [
         {"role": "system", "content": "你是中科大智能问答助手，请详细、准确地回答用户的问题。"},
@@ -60,9 +67,7 @@ def generate_answer(model, tokenizer, question, max_new_tokens=512):
         outputs = model.generate(
             **inputs,
             max_new_tokens=max_new_tokens,
-            temperature=0.7,
-            top_p=0.9,
-            do_sample=True,
+            do_sample=False,
         )
     generation_time = time.perf_counter() - start_time
 
@@ -73,65 +78,140 @@ def generate_answer(model, tokenizer, question, max_new_tokens=512):
     return answer, generation_time, output_tokens
 
 
-def compute_rouge_l(reference, hypothesis):
-    """计算 ROUGE-L F1 分数（基于最长公共子序列）"""
-    ref_chars = list(reference)
-    hyp_chars = list(hypothesis)
+def _tokenize_chinese(text):
+    """简易中文分词：按字符 bigram 切分，兼顾英文单词完整性"""
+    tokens = []
+    english_buffer = []
+    chars = list(text)
+    for char in chars:
+        if char.isascii() and char.isalnum():
+            english_buffer.append(char)
+        else:
+            if english_buffer:
+                tokens.append("".join(english_buffer))
+                english_buffer = []
+            if char.strip():
+                tokens.append(char)
+    if english_buffer:
+        tokens.append("".join(english_buffer))
+    # 生成 bigram 以捕捉中文词语
+    bigrams = []
+    for i in range(len(tokens) - 1):
+        bigrams.append(tokens[i] + tokens[i + 1])
+    return set(tokens) | set(bigrams)
 
-    if not ref_chars or not hyp_chars:
+def compute_rouge_l(reference, hypothesis):
+    """计算 ROUGE-L F1 分数（基于词级别 bigram 重叠，适合中文长文本）"""
+    if not reference.strip() or not hypothesis.strip():
         return 0.0
 
-    lcs_length = _lcs_length(ref_chars, hyp_chars)
-    precision = lcs_length / len(hyp_chars) if hyp_chars else 0
-    recall = lcs_length / len(ref_chars) if ref_chars else 0
+    ref_tokens = _tokenize_chinese(reference)
+    hyp_tokens = _tokenize_chinese(hypothesis)
+
+    if not ref_tokens or not hyp_tokens:
+        return 0.0
+
+    overlap = ref_tokens & hyp_tokens
+    precision = len(overlap) / len(hyp_tokens)
+    recall = len(overlap) / len(ref_tokens)
 
     if precision + recall == 0:
         return 0.0
     return round(2 * precision * recall / (precision + recall), 4)
 
 
-def _lcs_length(seq_a, seq_b):
-    """计算两个序列的最长公共子序列长度"""
-    len_a, len_b = len(seq_a), len(seq_b)
-    # 空间优化：只保留两行
-    prev = [0] * (len_b + 1)
-    curr = [0] * (len_b + 1)
-    for i in range(1, len_a + 1):
-        for j in range(1, len_b + 1):
-            if seq_a[i - 1] == seq_b[j - 1]:
-                curr[j] = prev[j - 1] + 1
-            else:
-                curr[j] = max(prev[j], curr[j - 1])
-        prev, curr = curr, [0] * (len_b + 1)
-    return prev[len_b]
 
+def _extract_entities_from_text(text):
+    """从文本中动态提取关键实体（专有名词、技术术语、机构名等）"""
+    entities = set()
+
+    # 1. 英文专有名词/技术术语（2字符以上的连续英文+数字）
+    english_terms = re.findall(r'[A-Za-z][A-Za-z0-9_.+-]{1,30}', text)
+    for term in english_terms:
+        # 过滤常见虚词
+        if term.lower() not in {"the", "and", "for", "with", "from", "that", "this", "are", "was", "not", "can", "will", "has", "have", "but", "also"}:
+            entities.add(term)
+
+    # 2. 中文专有名词：书名号/引号内的内容
+    quoted = re.findall(r'[《「『"](.*?)[》」』"]', text)
+    entities.update(q for q in quoted if 2 <= len(q) <= 20)
+
+    # 3. 中文机构/地点名：xx大学、xx学院、xx医院、xx公司、xx实验室等
+    org_patterns = re.findall(r'[\u4e00-\u9fff]{2,10}(?:大学|学院|医院|公司|实验室|研究院|研究所|中心|平台|基金会)', text)
+    entities.update(org_patterns)
+
+    # 4. 人名模式：xx教授、xx老师、xx同学等称谓前的名字
+    name_patterns = re.findall(r'([\u4e00-\u9fff]{2,4})(?:教授|老师|同学|学长|学姐|院士|博士|导师)', text)
+    entities.update(name_patterns)
+
+    # 5. 数字+单位的事实（如"12年"、"32GB"、"985"等）
+    num_facts = re.findall(r'\d+(?:年|月|天|人|分|元|%|GB|MB|TB|门|学分|个|条|篇|次|届|期)', text)
+    entities.update(num_facts)
+
+    # 6. URL
+    urls = re.findall(r'https?://\S+', text)
+    entities.update(urls)
+
+    return entities
+
+# 核心高频关键词（精简版，只保留最重要的跨主题通用词）
+_CORE_KEYWORDS = {
+    "中科大", "中国科学技术大学", "USTC", "软件学院", "合肥", "苏州",
+    "医保", "实习", "内推", "校招", "选课", "课程仓库", "开学考",
+    "毕业设计", "毕业论文", "答辩", "导师", "培养方案",
+}
 
 def compute_keyword_hit_rate(question, reference, generated):
-    """计算关键词命中率：参考答案中的关键词在生成答案中出现的比例"""
-    ustc_keywords = [
-        "中科大", "中国科学技术大学", "USTC", "合肥",
-        "少年班", "潘建伟", "量子", "科大讯飞",
-        "中科院", "国家实验室", "院士",
-        "研究", "学科", "专业", "实验室",
-        "博士", "硕士", "本科", "教授",
-    ]
+    """计算关键词命中率：核心词表 + 从参考答案动态提取的关键实体"""
+    # 混合策略：核心词表中出现在参考答案里的 + 动态提取的实体
+    core_hits = {kw for kw in _CORE_KEYWORDS if kw in reference}
+    dynamic_entities = _extract_entities_from_text(reference)
+    all_keywords = core_hits | dynamic_entities
 
-    # 从参考答案中提取出现的关键词
-    ref_keywords = [kw for kw in ustc_keywords if kw in reference]
-    if not ref_keywords:
+    if not all_keywords:
         return 1.0
 
-    hit_count = sum(1 for kw in ref_keywords if kw in generated)
-    return round(hit_count / len(ref_keywords), 4)
+    hit_count = sum(1 for kw in all_keywords if kw in generated)
+    return round(hit_count / len(all_keywords), 4)
 
 
 def compute_length_ratio(reference, generated):
-    """计算生成长度与参考长度的比值"""
+    """计算生成长度与参考长度的比值，并判断是否在合理范围内"""
     ref_len = len(reference)
     gen_len = len(generated)
     if ref_len == 0:
-        return 0.0
-    return round(gen_len / ref_len, 2)
+        return 0.0, False
+    ratio = round(gen_len / ref_len, 2)
+    is_reasonable = 0.3 <= ratio <= 3.0
+    return ratio, is_reasonable
+
+def compute_fact_hit_rate(reference, generated):
+    """计算事实命中率：从参考答案中提取关键实体（数字、专有名词、URL等），检查生成答案是否包含"""
+    # 提取参考答案中的关键事实片段
+    fact_patterns = [
+        re.findall(r'https?://\S+', reference),                          # URL
+        re.findall(r'[\w.]+@[\w.]+', reference),                         # 邮箱
+        re.findall(r'\d{4}年|\d+%|\d+学分|\d+门|\d+人', reference),       # 数量事实
+        re.findall(r'(?:任职于|就职于|来自|位于|地址[是为]?)\s*(\S{2,15})', reference),  # 机构/地点
+    ]
+
+    facts = []
+    for pattern_results in fact_patterns:
+        facts.extend(pattern_results)
+
+    # 提取引号内的专有名词
+    quoted = re.findall(r'[「『"](.*?)[」』"]', reference)
+    facts.extend([q for q in quoted if len(q) >= 2])
+
+    # 去重
+    facts = list(set(facts))
+    if not facts:
+        return 1.0, []
+
+    hit_facts = [f for f in facts if f in generated]
+    miss_facts = [f for f in facts if f not in generated]
+    hit_rate = round(len(hit_facts) / len(facts), 4)
+    return hit_rate, miss_facts
 
 
 def compute_format_score(generated):
@@ -185,17 +265,21 @@ def evaluate_model(
 
         rouge_l = compute_rouge_l(reference, generated)
         keyword_hit = compute_keyword_hit_rate(question, reference, generated)
-        length_ratio = compute_length_ratio(reference, generated)
+        length_ratio, length_reasonable = compute_length_ratio(reference, generated)
         format_score = compute_format_score(generated)
+        fact_hit, miss_facts = compute_fact_hit_rate(reference, generated)
 
         result = {
             "question": question,
-            "reference": reference[:200],
-            "generated": generated[:200],
+            "reference": reference[:500],
+            "generated": generated[:500],
             "rouge_l": rouge_l,
             "keyword_hit_rate": keyword_hit,
+            "fact_hit_rate": fact_hit,
             "length_ratio": length_ratio,
+            "length_reasonable": length_reasonable,
             "format_score": format_score,
+            "miss_facts": miss_facts[:5],
             "generation_time_seconds": round(gen_time, 3),
             "output_tokens": output_tokens,
         }
@@ -205,14 +289,19 @@ def evaluate_model(
             print(f"    进度: {i+1}/{len(samples)}")
 
     # 汇总指标
+    num_results = len(results)
+    length_abnormal_count = sum(1 for r in results if not r["length_reasonable"])
+
     summary = {
         "model_label": model_label,
-        "num_samples": len(results),
-        "avg_rouge_l": round(sum(r["rouge_l"] for r in results) / len(results), 4),
-        "avg_keyword_hit_rate": round(sum(r["keyword_hit_rate"] for r in results) / len(results), 4),
-        "avg_length_ratio": round(sum(r["length_ratio"] for r in results) / len(results), 2),
-        "avg_format_score": round(sum(r["format_score"] for r in results) / len(results), 2),
-        "avg_generation_time_seconds": round(total_generation_time / len(results), 3),
+        "num_samples": num_results,
+        "avg_rouge_l": round(sum(r["rouge_l"] for r in results) / num_results, 4),
+        "avg_keyword_hit_rate": round(sum(r["keyword_hit_rate"] for r in results) / num_results, 4),
+        "avg_fact_hit_rate": round(sum(r["fact_hit_rate"] for r in results) / num_results, 4),
+        "avg_length_ratio": round(sum(r["length_ratio"] for r in results) / num_results, 2),
+        "length_abnormal_ratio": round(length_abnormal_count / num_results, 4),
+        "avg_format_score": round(sum(r["format_score"] for r in results) / num_results, 2),
+        "avg_generation_time_seconds": round(total_generation_time / num_results, 3),
         "avg_tokens_per_second": round(total_tokens / total_generation_time, 1) if total_generation_time > 0 else 0,
         "total_output_tokens": total_tokens,
     }
@@ -265,7 +354,9 @@ def print_comparison(summaries):
     metrics = [
         ("ROUGE-L", "avg_rouge_l", True),
         ("关键词命中率", "avg_keyword_hit_rate", True),
+        ("事实命中率", "avg_fact_hit_rate", True),
         ("长度比 (生成/参考)", "avg_length_ratio", False),
+        ("长度异常比例", "length_abnormal_ratio", False),
         ("格式质量分", "avg_format_score", True),
         ("平均生成速度 (tok/s)", "avg_tokens_per_second", False),
         ("平均生成耗时 (s)", "avg_generation_time_seconds", False),
@@ -291,8 +382,8 @@ def main():
     parser = argparse.ArgumentParser(description="SFT 训练后模型评测")
     parser.add_argument("--base-model", type=str, default="Qwen/Qwen2.5-7B", help="基座模型路径")
     parser.add_argument("--lora-adapter", type=str, default="outputs/ustc-qa-lora", help="LoRA 适配器路径")
-    parser.add_argument("--test-data", type=str, default="data/qa_pairs.json", help="测试数据路径")
-    parser.add_argument("--num-samples", type=int, default=50, help="评测样本数")
+    parser.add_argument("--test-data", type=str, default="data/new_qa.json", help="测试数据路径")
+    parser.add_argument("--num-samples", type=int, default=200, help="评测样本数")
     parser.add_argument("--output", type=str, default="outputs/eval_report.json", help="评测报告输出路径")
     parser.add_argument("--skip-base", action="store_true", help="跳过基座模型评测（省时间）")
     args = parser.parse_args()

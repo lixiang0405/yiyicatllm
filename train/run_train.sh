@@ -10,7 +10,7 @@ set -e
 # --- 配置 ---
 TRAIN_CONFIG="train/train_lora.yaml"
 LLAMA_FACTORY_DIR="LLaMA-Factory"
-DATA_FILE="$(pwd)/data/train_data.json"
+DATA_FILE="$(pwd)/data/new_qa.json"
 OUTPUT_DIR="outputs/ustc-qa-lora"
 GPU_STATS_FILE="${OUTPUT_DIR}/gpu_stats.json"
 TRAIN_REPORT_FILE="${OUTPUT_DIR}/train_report.json"
@@ -27,7 +27,8 @@ fi
 
 # --- Step 1: 注册数据集到 LLaMA-Factory ---
 echo "[1/5] 注册数据集..."
-DATASET_INFO="${LLAMA_FACTORY_DIR}/data/dataset_info.json"
+DATASET_INFO="$(pwd)/${LLAMA_FACTORY_DIR}/data/dataset_info.json"
+DATASET_DIR_ABS="$(pwd)/${LLAMA_FACTORY_DIR}/data"
 
 python3 -c "
 import json
@@ -46,12 +47,16 @@ with open('${DATASET_INFO}', 'w') as f:
 print('  数据集注册成功: ustc_qa -> ${DATA_FILE}')
 "
 
+# 将 yaml 中的 dataset_dir 替换为绝对路径
+sed -i "s|^dataset_dir:.*|dataset_dir: ${DATASET_DIR_ABS}|" ${TRAIN_CONFIG}
+echo "  dataset_dir 已更新: ${DATASET_DIR_ABS}"
+
 # --- Step 2: 检查训练数据 ---
 echo "[2/5] 检查训练数据..."
 if [ ! -f "${DATA_FILE}" ]; then
-    echo "  [WARN] 训练数据不存在，使用 sample_data.json"
-    cp data/sample_data.json data/train_data.json
-    DATA_FILE="$(pwd)/data/train_data.json"
+    echo "  [WARN] new_qa.json 不存在，使用 sample_data.json"
+    cp data/sample_data.json data/new_qa.json
+    DATA_FILE="$(pwd)/data/new_qa.json"
 fi
 
 DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('${DATA_FILE}'))))")
