@@ -48,7 +48,7 @@ num_gpus = torch.cuda.device_count()
 print(f'  GPU 数量: {num_gpus}')
 for i in range(num_gpus):
     props = torch.cuda.get_device_properties(i)
-    print(f'  GPU {i}: {props.name} ({props.total_mem / 1024**3:.1f} GB, sm_{props.major}.{props.minor})')
+    print(f'  GPU {i}: {props.name} ({props.total_memory / 1024**3:.1f} GB, sm_{props.major}.{props.minor})')
 
 if num_gpus == 0:
     print('  ❌ 未检测到 GPU！')

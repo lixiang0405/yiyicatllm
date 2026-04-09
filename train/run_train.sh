@@ -86,7 +86,7 @@ for i in range(torch.cuda.device_count()):
     env_info['gpus'].append({
         'index': i,
         'name': props.name,
-        'total_memory_gb': round(props.total_mem / 1024**3, 1),
+        'total_memoryory_gb': round(props.total_memory / 1024**3, 1),
         'compute_capability': f'{props.major}.{props.minor}',
     })
 
@@ -95,7 +95,7 @@ with open('${TRAIN_REPORT_FILE}', 'w') as f:
     json.dump({'environment': env_info}, f, indent=2, ensure_ascii=False)
 
 for gpu in env_info['gpus']:
-    print(f\"  GPU {gpu['index']}: {gpu['name']} ({gpu['total_memory_gb']} GB, sm_{gpu['compute_capability']})\")
+    print(f\"  GPU {gpu['index']}: {gpu['name']} ({gpu['total_memoryory_gb']} GB, sm_{gpu['compute_capability']})\")
 "
 
 # --- Step 4: 启动 GPU 监控 (后台) ---
