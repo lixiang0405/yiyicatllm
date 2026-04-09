@@ -23,6 +23,7 @@ lora_target: all  # 对所有线性层应用 LoRA
 # 注意: 需要先在 LLaMA-Factory/data/dataset_info.json 中注册数据集
 # 添加: "ustc_qa": {"file_name": "/path/to/yiyicat-llm/data/train_data.json"}
 dataset: ustc_qa
+dataset_dir: LLaMA-Factory/data
 template: qwen
 cutoff_len: 2048
 
