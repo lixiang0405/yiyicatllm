@@ -1,0 +1,74 @@
+{
+  "environment": {
+    "pytorch_version": "2.8.0+cu128",
+    "cuda_version": "12.8",
+    "python_version": "3.12.3",
+    "os": "Linux-5.15.0-119-generic-x86_64-with-glibc2.35",
+    "num_gpus": 2,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 5090",
+        "total_memoryory_gb": 31.4,
+        "compute_capability": "12.0"
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA GeForce RTX 5090",
+        "total_memoryory_gb": 31.4,
+        "compute_capability": "12.0"
+      }
+    ]
+  },
+  "training_time": {
+    "start_time": "2026-04-09 21:06:06",
+    "end_time": "2026-04-09 21:27:49",
+    "duration_seconds": 1303,
+    "duration_human": "21分43秒"
+  },
+  "training_config": {
+    "data_file": "/root/yiyicat-llm/data/new_qa.json",
+    "data_count": 2940,
+    "config_file": "train/train_lora.yaml",
+    "num_gpus": 2,
+    "distributed": true
+  },
+  "gpu_stats_summary": {
+    "monitoring_duration_seconds": 1303.9,
+    "num_samples": 256,
+    "num_gpus": 2,
+    "gpus": {
+      "gpu_0": {
+        "name": "NVIDIA GeForce RTX 5090",
+        "memory_total_mb": 32607.0,
+        "memory_peak_mb": 18689.0,
+        "memory_peak_pct": 57.3,
+        "memory_avg_mb": 18318.0,
+        "gpu_utilization_avg_pct": 85.8,
+        "gpu_utilization_max_pct": 100.0,
+        "power_avg_w": 439.9,
+        "power_max_w": 513.32
+      },
+      "gpu_1": {
+        "name": "NVIDIA GeForce RTX 5090",
+        "memory_total_mb": 32607.0,
+        "memory_peak_mb": 18669.0,
+        "memory_peak_pct": 57.3,
+        "memory_avg_mb": 18336.9,
+        "gpu_utilization_avg_pct": 86.1,
+        "gpu_utilization_max_pct": 98.0,
+        "power_avg_w": 452.1,
+        "power_max_w": 525.44
+      }
+    }
+  },
+  "loss_curve": {
+    "train_loss_start": 2.3495147705078123,
+    "train_loss_end": 0.06749539971351623,
+    "eval_loss_start": null,
+    "eval_loss_end": null,
+    "eval_loss_best": null,
+    "num_train_log_entries": 184,
+    "num_eval_log_entries": 0
+  }
+}

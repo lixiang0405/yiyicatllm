@@ -1,0 +1,6433 @@
+{
+  "summary": {
+    "monitoring_duration_seconds": 1303.9,
+    "num_samples": 256,
+    "num_gpus": 2,
+    "gpus": {
+      "gpu_0": {
+        "name": "NVIDIA GeForce RTX 5090",
+        "memory_total_mb": 32607.0,
+        "memory_peak_mb": 18689.0,
+        "memory_peak_pct": 57.3,
+        "memory_avg_mb": 18318.0,
+        "gpu_utilization_avg_pct": 85.8,
+        "gpu_utilization_max_pct": 100.0,
+        "power_avg_w": 439.9,
+        "power_max_w": 513.32
+      },
+      "gpu_1": {
+        "name": "NVIDIA GeForce RTX 5090",
+        "memory_total_mb": 32607.0,
+        "memory_peak_mb": 18669.0,
+        "memory_peak_pct": 57.3,
+        "memory_avg_mb": 18336.9,
+        "gpu_utilization_avg_pct": 86.1,
+        "gpu_utilization_max_pct": 98.0,
+        "power_avg_w": 452.1,
+        "power_max_w": 525.44
+      }
+    }
+  },
+  "records": [
+    {
+      "elapsed_seconds": 0.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 0.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 0.0,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 27.0,
+          "power_w": 15.47
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 0.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 0.0,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 29.0,
+          "power_w": 18.46
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 5.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 0.0,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 27.0,
+          "power_w": 12.13
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 0.0,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 29.0,
+          "power_w": 16.03
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 10.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 0.0,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 27.0,
+          "power_w": 12.11
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 0.0,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 29.0,
+          "power_w": 14.99
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 15.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 801.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 2.5,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 30.0,
+          "power_w": 58.83
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 801.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 2.5,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 33.0,
+          "power_w": 73.55
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 20.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 13981.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 42.9,
+          "gpu_utilization_pct": 6.0,
+          "temperature_c": 30.0,
+          "power_w": 61.41
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 10981.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 33.7,
+          "gpu_utilization_pct": 6.0,
+          "temperature_c": 32.0,
+          "power_w": 72.07
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 25.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18369.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 51.0,
+          "power_w": 408.35
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18369.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 51.0,
+          "power_w": 423.75
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 30.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18409.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.5,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 49.0,
+          "power_w": 452.82
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18449.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 55.0,
+          "power_w": 482.35
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 35.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18429.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.5,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 54.0,
+          "power_w": 460.25
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18449.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 53.0,
+          "power_w": 472.09
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 40.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18429.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.5,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 57.0,
+          "power_w": 464.82
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 54.0,
+          "power_w": 455.3
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 45.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18429.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.5,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 61.0,
+          "power_w": 480.61
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 62.0,
+          "power_w": 484.23
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 51.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18429.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.5,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 61.0,
+          "power_w": 482.03
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 60.0,
+          "power_w": 469.51
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 56.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18449.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 62.0,
+          "power_w": 468.98
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 63.0,
+          "power_w": 496.73
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 61.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18449.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 62.0,
+          "power_w": 441.51
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 490.03
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 66.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18449.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 480.54
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 63.0,
+          "power_w": 460.95
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 71.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18449.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 63.0,
+          "power_w": 472.14
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 495.14
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 76.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 476.08
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 492.34
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 81.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 471.95
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 490.76
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 86.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 476.46
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 488.69
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 91.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 465.72
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 69.0,
+          "power_w": 502.36
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 96.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 464.19
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 90.0,
+          "temperature_c": 70.0,
+          "power_w": 492.2
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 102.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 496.18
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 504.95
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 107.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 500.75
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 493.2
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 112.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 70.0,
+          "power_w": 501.53
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 92.0,
+          "temperature_c": 70.0,
+          "power_w": 486.53
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 117.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 67.0,
+          "power_w": 478.64
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18529.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.8,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 513.22
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 122.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 467.82
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 496.84
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 127.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 488.72
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 504.41
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 132.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 71.0,
+          "power_w": 485.96
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 72.0,
+          "power_w": 500.23
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 137.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 478.67
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 72.0,
+          "power_w": 499.08
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 142.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 500.42
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 71.0,
+          "power_w": 492.07
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 147.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 70.0,
+          "power_w": 469.54
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 72.0,
+          "power_w": 502.22
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 153.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 56.0,
+          "power_w": 111.72
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 59.0,
+          "power_w": 122.2
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 158.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 51.0,
+          "power_w": 75.26
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 6.0,
+          "temperature_c": 54.0,
+          "power_w": 85.17
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 163.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 67.0,
+          "power_w": 507.01
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 479.52
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 168.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 489.85
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 465.86
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 173.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 472.15
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 484.04
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 178.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18469.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.6,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 473.97
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 512.34
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 183.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 484.95
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 478.42
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 188.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 492.22
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 492.26
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 193.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 480.83
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 516.8
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 198.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 496.14
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 499.3
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 203.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 477.63
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 495.03
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 209.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 67.0,
+          "power_w": 476.18
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 507.52
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 214.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 460.43
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 487.38
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 219.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 82.0,
+          "temperature_c": 65.0,
+          "power_w": 452.05
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 82.0,
+          "temperature_c": 72.0,
+          "power_w": 509.7
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 224.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 491.42
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 504.79
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 229.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 95.0,
+          "temperature_c": 68.0,
+          "power_w": 460.23
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 509.97
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 234.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 81.0,
+          "temperature_c": 67.0,
+          "power_w": 486.9
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 84.0,
+          "temperature_c": 71.0,
+          "power_w": 474.55
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 239.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 82.0,
+          "temperature_c": 61.0,
+          "power_w": 469.77
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 523.91
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 244.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 491.38
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 503.4
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 249.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 472.89
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 491.88
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 254.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 87.0,
+          "temperature_c": 63.0,
+          "power_w": 476.74
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 87.0,
+          "temperature_c": 71.0,
+          "power_w": 490.05
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 259.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 68.0,
+          "power_w": 459.62
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 475.36
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 265.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 468.1
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 496.08
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 270.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 496.48
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 496.73
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 275.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 61.0,
+          "power_w": 491.51
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 479.02
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 280.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 466.62
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 94.0,
+          "temperature_c": 70.0,
+          "power_w": 478.17
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 285.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 513.32
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 454.14
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 290.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 53.0,
+          "power_w": 101.35
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 56.0,
+          "power_w": 111.1
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 295.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 49.0,
+          "power_w": 73.6
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 52.0,
+          "power_w": 83.76
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 300.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 480.6
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 462.15
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 305.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 474.7
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 483.98
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 310.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 473.38
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 475.88
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 315.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 460.85
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 490.86
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 321.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 67.0,
+          "power_w": 499.43
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 481.46
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 326.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 68.0,
+          "power_w": 462.58
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 476.67
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 331.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 494.8
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 490.7
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 336.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 477.82
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 487.22
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 341.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 445.0
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 489.24
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 346.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 486.8
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 489.45
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 351.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 496.1
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 509.49
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 356.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 481.46
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 504.56
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 361.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 497.26
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 499.47
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 366.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 480.89
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 481.8
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 371.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 486.63
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 501.95
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 377.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 489.71
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 73.0,
+          "power_w": 512.34
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 382.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 462.19
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 512.81
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 387.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 465.75
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 73.0,
+          "power_w": 499.67
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 392.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 491.7
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 491.71
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 397.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 467.21
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 500.02
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 402.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 497.65
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 514.63
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 407.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 493.76
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 484.15
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 412.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 477.53
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 512.5
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 417.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 69.0,
+          "power_w": 501.22
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 71.0,
+          "power_w": 487.41
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 422.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 480.69
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 485.26
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 428.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 52.0,
+          "power_w": 77.72
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 56.0,
+          "power_w": 87.61
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 433.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 49.0,
+          "power_w": 73.13
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 52.0,
+          "power_w": 83.39
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 438.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 483.1
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 66.0,
+          "power_w": 493.13
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 443.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 492.43
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 494.06
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 448.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 487.62
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 93.0,
+          "temperature_c": 68.0,
+          "power_w": 500.85
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 453.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 77.0,
+          "temperature_c": 64.0,
+          "power_w": 480.88
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 78.0,
+          "temperature_c": 67.0,
+          "power_w": 494.02
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 458.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 457.53
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 86.0,
+          "temperature_c": 69.0,
+          "power_w": 491.85
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 463.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 499.63
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 508.16
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 468.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 486.69
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 477.26
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 473.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 66.0,
+          "power_w": 494.64
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 70.0,
+          "power_w": 486.6
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 478.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 78.0,
+          "temperature_c": 65.0,
+          "power_w": 468.71
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 68.0,
+          "power_w": 489.02
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 484.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 84.0,
+          "temperature_c": 68.0,
+          "power_w": 491.15
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 71.0,
+          "temperature_c": 70.0,
+          "power_w": 475.24
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 489.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 80.0,
+          "temperature_c": 65.0,
+          "power_w": 460.55
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 65.0,
+          "power_w": 504.04
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 494.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 87.0,
+          "temperature_c": 68.0,
+          "power_w": 503.45
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 80.0,
+          "temperature_c": 70.0,
+          "power_w": 476.05
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 499.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 487.8
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 510.65
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 504.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 486.23
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 513.33
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 509.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18549.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 56.9,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 69.0,
+          "power_w": 490.05
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 486.5
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 514.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 489.45
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 491.77
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 519.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 468.26
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 510.71
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 524.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 469.87
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 71.0,
+          "power_w": 495.95
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 529.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 476.04
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 506.95
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 535.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 493.77
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 71.0,
+          "power_w": 489.16
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 540.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 467.89
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 493.74
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 545.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 488.01
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 486.59
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 550.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 70.0,
+          "temperature_c": 68.0,
+          "power_w": 481.76
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 71.0,
+          "temperature_c": 71.0,
+          "power_w": 510.51
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 555.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 78.0,
+          "temperature_c": 69.0,
+          "power_w": 441.26
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 522.58
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 560.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 71.0,
+          "power_w": 470.93
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 504.99
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 565.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 51.0,
+          "power_w": 75.81
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 55.0,
+          "power_w": 86.71
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 570.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 100.0,
+          "temperature_c": 50.0,
+          "power_w": 97.5
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 52.0,
+          "power_w": 82.19
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 575.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 66.0,
+          "power_w": 485.24
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 66.0,
+          "power_w": 476.96
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 580.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 491.15
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 497.72
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 585.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 66.0,
+          "power_w": 468.43
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 500.9
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 591.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 459.5
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 492.2
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 596.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 94.0,
+          "temperature_c": 68.0,
+          "power_w": 475.83
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 503.74
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 601.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 67.0,
+          "power_w": 481.98
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 483.37
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 606.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 92.0,
+          "temperature_c": 68.0,
+          "power_w": 494.21
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 71.0,
+          "power_w": 487.33
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 611.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 487.84
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 480.43
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 616.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 493.36
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 71.0,
+          "power_w": 489.48
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 621.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 68.0,
+          "power_w": 494.91
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 493.3
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 626.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 67.0,
+          "power_w": 466.09
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 496.99
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 631.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 476.39
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 495.14
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 636.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 68.0,
+          "power_w": 493.67
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 66.0,
+          "power_w": 496.53
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 641.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 495.43
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 90.0,
+          "temperature_c": 63.0,
+          "power_w": 461.67
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 647.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 67.0,
+          "power_w": 486.39
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 67.0,
+          "power_w": 474.74
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 652.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 478.47
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 92.0,
+          "temperature_c": 71.0,
+          "power_w": 499.08
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 657.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 486.91
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 487.86
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 662.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 491.75
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 493.88
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 667.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 479.08
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 509.09
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 672.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 481.01
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 496.77
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 677.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 468.02
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 502.11
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 682.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 67.0,
+          "power_w": 481.36
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 495.33
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 687.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 472.11
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 507.9
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 693.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 481.74
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 510.27
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 698.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 475.34
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 468.06
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 703.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 51.0,
+          "power_w": 76.12
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 6.0,
+          "temperature_c": 55.0,
+          "power_w": 86.41
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 708.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 60.0,
+          "power_w": 142.92
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 62.0,
+          "power_w": 130.1
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 713.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 475.22
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 506.15
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 718.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 60.0,
+          "power_w": 488.2
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 64.0,
+          "power_w": 488.72
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 723.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 478.25
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 500.77
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 728.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 478.1
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 492.01
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 733.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 501.27
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 511.72
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 738.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 503.45
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 512.71
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 743.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 481.3
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 489.8
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 748.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 496.55
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 499.81
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 754.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 492.31
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 500.29
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 759.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 505.08
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 480.68
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 764.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 505.65
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 71.0,
+          "power_w": 500.45
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 769.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 86.0,
+          "temperature_c": 69.0,
+          "power_w": 481.2
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 505.33
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 774.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 77.0,
+          "temperature_c": 65.0,
+          "power_w": 485.17
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 77.0,
+          "temperature_c": 70.0,
+          "power_w": 474.52
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 779.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 62.0,
+          "power_w": 489.01
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 78.0,
+          "temperature_c": 67.0,
+          "power_w": 484.67
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 784.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 92.0,
+          "temperature_c": 70.0,
+          "power_w": 499.61
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 482.35
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 789.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 64.0,
+          "power_w": 456.3
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 71.0,
+          "power_w": 508.7
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 794.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 479.99
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 70.0,
+          "power_w": 505.62
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 799.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 489.76
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 496.4
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 804.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 492.07
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 501.75
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 810.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 489.08
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 495.23
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 815.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 68.0,
+          "power_w": 482.23
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 521.33
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 820.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 496.67
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 491.01
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 825.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 493.9
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 510.27
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 830.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 477.88
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 493.47
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 835.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 493.64
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 511.37
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 840.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 50.0,
+          "power_w": 75.56
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 54.0,
+          "power_w": 85.64
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 845.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 62.0,
+          "power_w": 410.36
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 455.45
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 850.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 475.47
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 65.0,
+          "power_w": 495.02
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 855.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 487.82
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 85.0,
+          "temperature_c": 67.0,
+          "power_w": 491.36
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 861.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 492.4
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 69.0,
+          "power_w": 517.76
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 866.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 67.0,
+          "power_w": 468.9
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 482.36
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 871.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 92.0,
+          "temperature_c": 67.0,
+          "power_w": 477.45
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 510.66
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 876.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 68.0,
+          "power_w": 501.83
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 485.52
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 881.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 498.86
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 93.0,
+          "temperature_c": 69.0,
+          "power_w": 483.44
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 886.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 474.14
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 509.39
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 891.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 83.0,
+          "temperature_c": 67.0,
+          "power_w": 438.04
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 71.0,
+          "power_w": 497.81
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 896.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 95.0,
+          "temperature_c": 69.0,
+          "power_w": 489.86
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 504.34
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 901.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 69.0,
+          "power_w": 480.22
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 512.86
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 906.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 499.07
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 499.42
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 911.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 463.66
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 498.51
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 917.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 489.27
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 509.03
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 922.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 477.64
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 487.83
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 927.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 487.94
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 511.98
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 932.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 509.94
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 518.48
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 937.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 487.72
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 492.88
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 942.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 497.87
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 72.0,
+          "power_w": 503.99
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 947.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 478.43
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 505.97
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 952.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 475.33
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 525.44
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 957.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 483.62
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 516.45
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 962.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 90.0,
+          "temperature_c": 68.0,
+          "power_w": 484.53
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 495.77
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 967.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 92.0,
+          "temperature_c": 69.0,
+          "power_w": 486.3
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 493.13
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 973.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 55.0,
+          "power_w": 113.04
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 59.0,
+          "power_w": 128.16
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 978.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 50.0,
+          "power_w": 74.42
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 53.0,
+          "power_w": 84.38
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 983.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 456.01
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 65.0,
+          "power_w": 461.16
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 988.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 489.06
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 481.31
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 993.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 472.88
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 492.38
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 998.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 492.34
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 492.4
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1003.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 67.0,
+          "power_w": 495.95
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 428.94
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1008.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 467.71
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 503.55
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1013.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 501.9
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 481.38
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1018.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 68.0,
+          "power_w": 480.07
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 503.66
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1023.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 68.0,
+          "power_w": 491.6
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 71.0,
+          "power_w": 467.43
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1028.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 471.53
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 71.0,
+          "power_w": 483.84
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1034.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 68.0,
+          "power_w": 496.25
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 71.0,
+          "power_w": 469.07
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1039.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 70.0,
+          "power_w": 467.34
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 73.0,
+          "power_w": 474.27
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1044.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 83.0,
+          "temperature_c": 65.0,
+          "power_w": 480.59
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 85.0,
+          "temperature_c": 71.0,
+          "power_w": 490.67
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1049.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 477.45
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 476.43
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1054.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 463.75
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 510.92
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1059.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 490.19
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 500.57
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1064.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 70.0,
+          "power_w": 484.08
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 501.61
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1069.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 480.59
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 490.9
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1074.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 67.0,
+          "power_w": 477.41
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 479.28
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1079.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 86.0,
+          "temperature_c": 69.0,
+          "power_w": 481.46
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 489.93
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1085.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 70.0,
+          "power_w": 506.36
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 504.47
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1090.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 474.39
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 489.22
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1095.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 87.0,
+          "temperature_c": 68.0,
+          "power_w": 486.98
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 71.0,
+          "power_w": 507.31
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1100.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 68.0,
+          "power_w": 502.52
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 78.0,
+          "temperature_c": 70.0,
+          "power_w": 475.3
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1105.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 64.0,
+          "power_w": 482.93
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 79.0,
+          "temperature_c": 70.0,
+          "power_w": 500.52
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1110.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 55.0,
+          "power_w": 111.09
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 58.0,
+          "power_w": 120.12
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1115.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 49.0,
+          "power_w": 74.1
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 53.0,
+          "power_w": 83.75
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1120.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 455.7
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 507.88
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1125.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 477.71
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 501.25
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1130.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 488.12
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 90.0,
+          "temperature_c": 68.0,
+          "power_w": 482.73
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1135.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 468.02
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 505.13
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1141.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 68.0,
+          "power_w": 496.86
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 498.74
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1146.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 485.09
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 493.77
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1151.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 468.94
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 70.0,
+          "power_w": 505.15
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1156.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 489.41
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 490.76
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1161.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 485.46
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 508.11
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1166.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 456.86
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 497.32
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1171.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 89.0,
+          "temperature_c": 69.0,
+          "power_w": 487.79
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 458.45
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1176.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 498.95
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 69.0,
+          "power_w": 495.17
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1181.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 481.73
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 70.0,
+          "power_w": 509.45
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1186.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 496.48
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 491.9
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1191.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 68.0,
+          "power_w": 474.66
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 96.0,
+          "temperature_c": 71.0,
+          "power_w": 506.38
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1196.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 94.0,
+          "temperature_c": 68.0,
+          "power_w": 496.21
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 492.59
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1202.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 63.0,
+          "power_w": 468.56
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 88.0,
+          "temperature_c": 67.0,
+          "power_w": 485.28
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1207.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 465.39
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 511.51
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1212.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 472.16
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 508.01
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1217.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 480.37
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 488.99
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1222.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 487.6
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 495.73
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1227.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 499.9
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 70.0,
+          "power_w": 492.81
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1232.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 456.58
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 493.84
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1237.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 494.63
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 97.0,
+          "temperature_c": 70.0,
+          "power_w": 503.15
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1242.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 491.74
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 71.0,
+          "power_w": 484.55
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1247.9,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 54.0,
+          "power_w": 107.94
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 57.0,
+          "power_w": 117.34
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1253.0,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 49.0,
+          "power_w": 73.85
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 53.0,
+          "power_w": 83.83
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1258.1,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 478.28
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 499.9
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1263.2,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 65.0,
+          "power_w": 474.65
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 68.0,
+          "power_w": 496.22
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1268.3,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 66.0,
+          "power_w": 455.87
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 471.99
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1273.4,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 497.04
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 498.13
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1278.5,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 67.0,
+          "power_w": 475.71
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 98.0,
+          "temperature_c": 69.0,
+          "power_w": 509.79
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1283.6,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 51.0,
+          "power_w": 81.46
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 54.0,
+          "power_w": 87.96
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1288.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 47.0,
+          "power_w": 71.48
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 51.0,
+          "power_w": 81.46
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1293.7,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 46.0,
+          "power_w": 69.71
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 7.0,
+          "temperature_c": 49.0,
+          "power_w": 78.81
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1298.8,
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18689.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 44.0,
+          "power_w": 67.84
+        },
+        {
+          "gpu_index": 1,
+          "gpu_name": "NVIDIA GeForce RTX 5090",
+          "memory_used_mb": 18669.0,
+          "memory_total_mb": 32607.0,
+          "memory_used_pct": 57.3,
+          "gpu_utilization_pct": 0.0,
+          "temperature_c": 47.0,
+          "power_w": 77.09
+        }
+      ]
+    }
+  ]
+}
