@@ -122,13 +122,13 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 cd "${PROJECT_DIR}"
 
 # 检查训练数据 new_qa.json
-if [ -f "data/${TRAIN_DATA}" ]; then
-    DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('data/${TRAIN_DATA}'))))")
+if [ -f "${TRAIN_DATA}" ]; then
+    DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('${TRAIN_DATA}'))))")
     echo "  训练数据: ${DATA_COUNT} 条 (来自 ${TRAIN_DATA})"
 else
     echo "  [WARN] ${TRAIN_DATA} 不存在，使用 sample_data.json"
-    cp data/sample_data.json "data/${TRAIN_DATA}"
-    DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('data/${TRAIN_DATA}'))))")
+    cp sample_data.json "${TRAIN_DATA}"
+    DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('${TRAIN_DATA}'))))")
     echo "  训练数据: ${DATA_COUNT} 条 (示例数据)"
 fi
 
