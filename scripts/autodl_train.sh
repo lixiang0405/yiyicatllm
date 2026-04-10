@@ -104,23 +104,54 @@ install_with_retry pandas pyarrow
 
 echo ""
 echo "  安装 vLLM + veRL (GRPO 强化学习)..."
-# vLLM 在阿里云镜像中没有，使用清华源加速下载
-echo "  → vLLM 使用清华源安装（阿里云镜像无此包）..."
-pip install vllm \
-    -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    --trusted-host pypi.tuna.tsinghua.edu.cn \
-    --timeout 600 --retries 10 2>&1 | tail -5 || \
-    pip install vllm --timeout 600 --retries 10 2>&1 | tail -5 || \
-    echo "  ⚠️  vLLM 安装失败，GRPO 阶段将不可用（SFT/DPO 不受影响）"
 
-# 安装 veRL
-install_with_retry verl
+# AutoDL 学术加速：开启后可快速访问 GitHub/PyPI
+if [ -f /etc/network_turbo ]; then
+    echo "  → 开启 AutoDL 学术资源加速..."
+    source /etc/network_turbo 2>/dev/null || true
+fi
 
-# 验证 vLLM + veRL 安装
+# ---- 快速安装 vLLM ----
+# 策略：先检查是否已安装，未安装则按优先级尝试多种方式
+# 1) vLLM 官方 nightly wheel（最快，直接下载预编译包）
+# 2) PyPI 官方源
+echo "  → 安装 vLLM..."
+if python3 -c "import vllm" 2>/dev/null; then
+    echo "  ✅ vLLM 已安装，跳过"
+else
+    # 方式1: 从 vLLM 官方 wheel 仓库直接安装预编译包（速度最快）
+    echo "  → 尝试从 vLLM 官方 wheel 仓库安装（预编译，最快）..."
+    CUDA_VERSION=$(python3 -c "import torch; print(torch.version.cuda.replace('.','')[:3])" 2>/dev/null || echo "128")
+    PY_VERSION=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')" 2>/dev/null || echo "cp312")
+    pip install vllm --pre --extra-index-url https://wheels.vllm.ai/nightly --timeout 300 --retries 5 2>&1 | tail -5 && \
+        echo "  ✅ vLLM 从官方 wheel 安装成功" || {
+        # 方式2: PyPI 官方源
+        echo "  → wheel 安装失败，尝试 PyPI 官方源..."
+        pip install vllm -i https://pypi.org/simple --trusted-host pypi.org --timeout 600 --retries 10 2>&1 | tail -5 || \
+            echo "  ⚠️  vLLM 安装失败，GRPO 阶段将不可用（SFT/DPO 不受影响）"
+    }
+fi
+
+# ---- 快速安装 veRL ----
+echo "  → 安装 veRL..."
+if python3 -c "import verl" 2>/dev/null; then
+    echo "  ✅ veRL 已安装，跳过"
+else
+    pip install verl -i https://pypi.org/simple --trusted-host pypi.org --timeout 600 --retries 10 2>&1 | tail -5 || \
+        echo "  ⚠️  veRL 安装失败，GRPO 阶段将不可用（SFT/DPO 不受影响）"
+fi
+
+# 关闭学术加速（避免影响后续国内源下载）
+if [ -f /etc/network_turbo ]; then
+    unset http_proxy https_proxy no_proxy HTTP_PROXY HTTPS_PROXY NO_PROXY 2>/dev/null || true
+    echo "  → 已关闭学术加速，恢复国内源"
+fi
+
+# 验证安装
 echo "  → 验证 vLLM + veRL 安装..."
-python3 -c "import vllm; print(f'  ✅ vLLM 安装成功: {vllm.__version__}')" 2>/dev/null || \
+python3 -c "import vllm; print(f'  ✅ vLLM {vllm.__version__}')" 2>/dev/null || \
     echo "  ⚠️  vLLM 未安装成功，GRPO 阶段将不可用"
-python3 -c "import verl; print(f'  ✅ veRL 安装成功')" 2>/dev/null || \
+python3 -c "import verl; print('  ✅ veRL 安装成功')" 2>/dev/null || \
     echo "  ⚠️  veRL 未安装成功，GRPO 阶段将不可用"
 echo ""
 echo "  安装 LLaMA-Factory..."
