@@ -65,13 +65,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  [1/11] 安装依赖"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# 开启 AutoDL 网络加速（如果可用）
-if [ -f /etc/network_turbo ]; then
-    source /etc/network_turbo
-    echo "  ✅ AutoDL 网络加速已开启"
-fi
-
-# 设置 pip 全局使用阿里云镜像（比清华源更快更稳定）
+# 设置 pip 全局使用阿里云镜像
 pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ 2>/dev/null || true
 pip config set global.trusted-host mirrors.aliyun.com 2>/dev/null || true
 
@@ -83,11 +77,11 @@ pip install transformers>=4.46.0 datasets>=3.0.0 accelerate>=1.0.0 \
 
 echo ""
 echo "  安装 veRL + vLLM (GRPO 强化学习)..."
-# 先单独装 vLLM（用官方源，AutoDL 有学术网络加速）
-pip install vllm -i https://pypi.org/simple --timeout 300
+# 先单独装 vLLM（用阿里云源加速）
+pip install vllm -i https://mirrors.aliyun.com/pypi/simple/ --timeout 300 2>&1 | tail -5
 
 # 再装 veRL
-pip install verl -i https://pypi.org/simple --timeout 300
+pip install verl -i https://mirrors.aliyun.com/pypi/simple/ --timeout 300 2>&1 | tail -5
 echo ""
 echo "  安装 LLaMA-Factory..."
 if [ ! -d "${PROJECT_DIR}/LLaMA-Factory" ]; then
