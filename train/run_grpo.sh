@@ -109,7 +109,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.lora_rank=32 \
     actor_rollout_ref.model.lora_alpha=64 \
     actor_rollout_ref.model.target_modules=all-linear \
-    actor_rollout_ref.actor.ppo_mini_batch_size=32 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=16 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.actor.ppo_epochs=1 \
     actor_rollout_ref.actor.use_kl_loss=true \
