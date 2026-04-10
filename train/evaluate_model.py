@@ -53,10 +53,10 @@ def load_model(base_model_path, lora_adapter_path=None):
     return model, tokenizer
 
 
-def generate_answer(model, tokenizer, question, max_new_tokens=1024):
+def generate_answer(model, tokenizer, question, max_new_tokens=512):
     """生成单个回答"""
     messages = [
-        {"role": "system", "content": "你是中科大智能问答助手，请详细、准确地回答用户的问题。"},
+        {"role": "system", "content": "你是中科大智能问答助手，请详细、准确地回答用户的问题。回答控制在100-300字以内。"},
         {"role": "user", "content": question},
     ]
     text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
@@ -68,6 +68,7 @@ def generate_answer(model, tokenizer, question, max_new_tokens=1024):
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,
+            repetition_penalty=1.2,
         )
     generation_time = time.perf_counter() - start_time
 

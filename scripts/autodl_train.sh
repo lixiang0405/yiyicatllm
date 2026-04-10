@@ -155,7 +155,7 @@ fi
     echo "    batch_size/卡: 4"
 echo "    grad_accum: 4"
 echo "    有效 batch_size: $((4 * 4 * NUM_GPUS))"
-echo "    epochs: 6"
+echo "    epochs: 10"
 echo "    验证集: 10%"
 # ==========================================
 # Step 5: 开始 SFT LoRA 训练
