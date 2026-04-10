@@ -76,15 +76,16 @@ echo "  Actor 模型: ${DPO_MODEL_PATH}"
 echo "  奖励函数: 规则奖励 (reward_function.py)"
 echo "  每个 prompt 采样: 4 个回答"
 
-# veRL 启动 GRPO 训练
+# veRL 使用 Hydra 配置系统，需要用 --config-path + --config-name
 python3 -m verl.trainer.main_ppo \
-    --config "${VERL_CONFIG}" \
-    --data.train_files "${GRPO_DATA}" \
-    --actor_rollout_ref.model.path "${DPO_MODEL_PATH}" \
-    --actor_rollout_ref.rollout.tensor_model_parallel_size 1 \
-    --trainer.n_gpus_per_node "${NUM_GPUS}" \
-    --trainer.experiment_name "grpo-$(date +%Y%m%d-%H%M%S)" \
-    --trainer.default_local_dir "${PROJECT_DIR}/outputs/ustc-qa-grpo"
+    --config-path="${PROJECT_DIR}/train" \
+    --config-name="verl_config" \
+    data.train_files="${GRPO_DATA}" \
+    actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    trainer.n_gpus_per_node="${NUM_GPUS}" \
+    trainer.experiment_name="grpo-$(date +%Y%m%d-%H%M%S)" \
+    trainer.default_local_dir="${PROJECT_DIR}/outputs/ustc-qa-grpo"
 
 echo ""
 echo "=========================================="
