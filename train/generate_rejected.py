@@ -33,6 +33,58 @@ SYSTEM_PROMPT = (
 )
 
 
+import re
+
+
+def clean_generated_text(text):
+    """清洗生成文本：去除非中英文数字标点的乱码，截断跑偏内容"""
+    text = text.strip()
+
+    # 逐字符扫描，遇到连续的非中英文数字标点字符（如泰文、乱码）就截断
+    # 允许的字符：中文、英文、数字、常见标点、换行
+    allowed_pattern = re.compile(
+        r'[\u4e00-\u9fff'        # 中文
+        r'\u3000-\u303f'         # 中文标点
+        r'\uff00-\uffef'         # 全角字符
+        r'a-zA-Z0-9'            # 英文数字
+        r'\s'                    # 空白字符
+        r'，。！？、；：""''（）【】《》…—·'  # 中文标点
+        r',.!?;:\'\"()\[\]{}<>@#$%^&*+=\-_/\\|~`'  # 英文标点
+        r']'
+    )
+
+    clean_chars = []
+    foreign_streak = 0
+    for char in text:
+        if allowed_pattern.match(char):
+            foreign_streak = 0
+            clean_chars.append(char)
+        else:
+            foreign_streak += 1
+            # 连续出现 3 个以上非法字符，认为是乱码，截断
+            if foreign_streak >= 3:
+                # 回退已加入的零散非法字符
+                while clean_chars and not allowed_pattern.match(clean_chars[-1]):
+                    clean_chars.pop()
+                break
+
+    result = ''.join(clean_chars).strip()
+
+    # 去掉末尾不完整的句子（如果最后一个字符不是句号/问号/感叹号/引号）
+    end_marks = '。！？"\'）】》…'
+    if result and result[-1] not in end_marks:
+        # 找最后一个句号位置，截断到那里
+        last_mark = -1
+        for mark in end_marks:
+            pos = result.rfind(mark)
+            if pos > last_mark:
+                last_mark = pos
+        if last_mark > len(result) * 0.5:  # 只有截断不超过一半时才截
+            result = result[:last_mark + 1]
+
+    return result
+
+
 def build_prompts(tokenizer, questions):
     """构建带通用 system prompt 的 chat 格式 prompt（生成质量接近但不够详细的回答）"""
     prompts = []
@@ -172,7 +224,7 @@ def main():
         for offset, output in enumerate(outputs):
             global_idx = batch_start + offset
             data_idx = need_generate[global_idx]
-            rejected = output.outputs[0].text.strip()
+            rejected = clean_generated_text(output.outputs[0].text)
 
             if len(rejected) < 10:
                 rejected = "这个问题我不太清楚，建议你去学校官网查一下。"
