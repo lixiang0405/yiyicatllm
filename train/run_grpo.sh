@@ -119,9 +119,9 @@ python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
     trainer.total_epochs=1 \
     trainer.val_before_train=false \
+    trainer.val_only=false \
     trainer.test_freq=-1 \
     trainer.save_freq=50 \
-    trainer.test_freq=-1 \
     trainer.project_name=ustc-qa-grpo \
     trainer.n_gpus_per_node="${NUM_GPUS}" \
     trainer.experiment_name="grpo-$(date +%Y%m%d-%H%M%S)" \
