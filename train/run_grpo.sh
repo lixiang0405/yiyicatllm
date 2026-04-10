@@ -53,11 +53,14 @@ fi
 
 # --- 准备 GRPO 数据 ---
 echo "[1/3] 准备 GRPO 训练数据..."
-if [ ! -f "${GRPO_DATA}" ]; then
+GRPO_EVAL_DATA="${PROJECT_DIR}/data/grpo_eval.parquet"
+if [ ! -f "${GRPO_DATA}" ] || [ ! -f "${GRPO_EVAL_DATA}" ]; then
     python3 "${PROJECT_DIR}/train/prepare_grpo_data.py" \
         --sft-data "${PROJECT_DIR}/data/new_qa.json" \
         --pref-data "${PROJECT_DIR}/data/dpo_train_data.json" \
-        --output "${GRPO_DATA}"
+        --output "${GRPO_DATA}" \
+        --eval-data "${PROJECT_DIR}/data/eval_data.json" \
+        --eval-output "${GRPO_EVAL_DATA}"
 fi
 DATA_COUNT=$(python3 -c "import pandas as pd; print(len(pd.read_parquet('${GRPO_DATA}')))")
 echo "  GRPO 数据: ${DATA_COUNT} 条 prompts"
@@ -84,7 +87,7 @@ sleep 2
 python3 -m verl.trainer.main_ppo \
     --config-name="ppo_trainer" \
     data.train_files="${GRPO_DATA}" \
-    data.val_files="${GRPO_DATA}" \    data.prompt_key=prompt \
+    data.val_files="${PROJECT_DIR}/data/grpo_eval.parquet" \    data.prompt_key=prompt \
     data.max_prompt_length=512 \
     data.max_response_length=512 \
     data.train_batch_size=32 \
@@ -117,9 +120,9 @@ python3 -m verl.trainer.main_ppo \
     custom_reward_function.name=compute_reward \
     algorithm.adv_estimator=grpo \
     trainer.total_epochs=1 \
-    trainer.val_before_train=false \
+    trainer.val_before_train=true \
     trainer.val_only=false \
-    trainer.test_freq=-1 \
+    trainer.test_freq=20 \
     trainer.save_freq=50 \
     trainer.project_name=ustc-qa-grpo \
     trainer.n_gpus_per_node="${NUM_GPUS}" \
