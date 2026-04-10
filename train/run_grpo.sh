@@ -126,6 +126,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.val_only=false \
     trainer.test_freq=20 \
     trainer.save_freq=50 \
+    trainer.use_legacy_worker_impl=auto \
     trainer.project_name=ustc-qa-grpo \
     trainer.n_gpus_per_node="${NUM_GPUS}" \
     trainer.experiment_name="grpo-$(date +%Y%m%d-%H%M%S)" \
