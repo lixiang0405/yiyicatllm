@@ -81,7 +81,13 @@ echo "  每个 prompt 采样: 4 个回答"
 
 # 清理上一次的 Ray 进程，避免缓存导致配置不生效
 ray stop --force 2>/dev/null || true
-sleep 2
+pkill -9 -f "vllm" 2>/dev/null || true
+sleep 3
+
+# vLLM 0.19.0 默认使用 v1 引擎，和 veRL 0.7.1 的 agent_loop 有兼容性问题
+# 强制使用 v0 引擎 + 设置显存碎片优化
+export VLLM_USE_V1=0
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # veRL 使用 Hydra 配置系统，基于内置 ppo_trainer.yaml 默认配置，通过命令行覆盖参数
 python3 -m verl.trainer.main_ppo \
@@ -91,13 +97,13 @@ python3 -m verl.trainer.main_ppo \
     data.prompt_key=prompt \
     data.max_prompt_length=256 \
     data.max_response_length=256 \
-    data.train_batch_size=64 \
+    data.train_batch_size=16 \
     data.trust_remote_code=true \
     actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
     actor_rollout_ref.model.trust_remote_code=true \
     +actor_rollout_ref.model.override_config.attn_implementation=sdpa \
-    actor_rollout_ref.actor.ppo_mini_batch_size=32 \
-    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=8 \
+    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.actor.ppo_epochs=1 \
     actor_rollout_ref.actor.use_kl_loss=true \
     actor_rollout_ref.actor.kl_loss_coef=0.002 \
@@ -106,17 +112,17 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.actor.optim.lr_warmup_steps=20 \
     actor_rollout_ref.actor.optim.lr_scheduler_type=constant \
-    actor_rollout_ref.actor.fsdp_config.param_offload=false \
-    actor_rollout_ref.actor.fsdp_config.optimizer_offload=false \
+    actor_rollout_ref.actor.fsdp_config.param_offload=true \
+    actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.3 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.25 \
     actor_rollout_ref.rollout.temperature=0.7 \
     actor_rollout_ref.rollout.top_p=0.9 \
-    actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.n=2 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
-    actor_rollout_ref.ref.fsdp_config.param_offload=false \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.ref.fsdp_config.param_offload=true \
     reward_model.enable=false \
     custom_reward_function.path=train/reward_function.py \
     custom_reward_function.name=compute_reward \
