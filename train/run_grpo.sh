@@ -84,9 +84,10 @@ ray stop --force 2>/dev/null || true
 pkill -9 -f "vllm" 2>/dev/null || true
 sleep 3
 
-# 显存碎片优化
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-
+# vLLM v1 使用 CuMemAllocator 内存池，不兼容 expandable_segments
+# 所以这里不能设置 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+unset PYTORCH_CUDA_ALLOC_CONF 2>/dev/null || true
+export VLLM_WORKER_MULTIPROC_METHOD=spawn
 # ============================================
 # veRL + vLLM 0.8+ (V1 engine) 配置
 # 关键：需要 enforce_eager=False + free_cache_engine=True
