@@ -84,20 +84,38 @@ ray stop --force 2>/dev/null || true
 pkill -9 -f "vllm" 2>/dev/null || true
 sleep 3
 
-# vLLM 0.19.0 默认使用 v1 引擎，和 veRL 0.7.1 的 agent_loop 有兼容性问题
-# 强制使用 v0 引擎 + 设置显存碎片优化
-export VLLM_USE_V1=0
+# 显存碎片优化
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-# veRL 使用 Hydra 配置系统，基于内置 ppo_trainer.yaml 默认配置，通过命令行覆盖参数
-python3 -m verl.trainer.main_ppo \
-    --config-name="ppo_trainer" \
+# ============================================
+# 使用 veRL one_step_off_policy 异步模式
+# 训练和推理分离到不同 GPU，避免 hybrid engine 的 vLLM v1 兼容性问题
+# GPU 0: Actor 训练 (FSDP2 + LoRA)
+# GPU 1: vLLM 独立推理 (rollout)
+# ============================================
+
+# 训练卡数 = 总卡数 - 推理卡数
+ROLLOUT_GPUS=1
+TRAIN_GPUS=$((NUM_GPUS - ROLLOUT_GPUS))
+if [ "${TRAIN_GPUS}" -lt 1 ]; then
+    TRAIN_GPUS=1
+    ROLLOUT_GPUS=1
+fi
+echo "  训练 GPU: ${TRAIN_GPUS} 张 | 推理 GPU: ${ROLLOUT_GPUS} 张"
+
+# train_batch_size 必须能被 TRAIN_GPUS 整除
+# rollout.n * train_batch_size 必须能被 TRAIN_GPUS 整除
+TRAIN_BATCH_SIZE=16
+ROLLOUT_N=4
+
+python3 -m verl.experimental.one_step_off_policy.async_main_ppo \
+    --config-name="one_step_off_ppo_trainer" \
     data.train_files="${GRPO_DATA}" \
     data.val_files="${PROJECT_DIR}/data/grpo_eval.parquet" \
     data.prompt_key=prompt \
     data.max_prompt_length=256 \
     data.max_response_length=256 \
-    data.train_batch_size=32 \
+    data.train_batch_size=${TRAIN_BATCH_SIZE} \
     data.trust_remote_code=true \
     actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
     actor_rollout_ref.model.trust_remote_code=true \
@@ -105,7 +123,9 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.lora_rank=32 \
     actor_rollout_ref.model.lora_alpha=64 \
     actor_rollout_ref.model.target_modules=all-linear \
-    actor_rollout_ref.actor.ppo_mini_batch_size=32 \
+    actor_rollout_ref.hybrid_engine=false \
+    actor_rollout_ref.actor.strategy=fsdp2 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=${TRAIN_BATCH_SIZE} \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.actor.ppo_epochs=1 \
     actor_rollout_ref.actor.use_kl_loss=true \
@@ -115,17 +135,17 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.actor.optim.lr_warmup_steps=20 \
     actor_rollout_ref.actor.optim.lr_scheduler_type=constant \
-    actor_rollout_ref.actor.fsdp_config.param_offload=false \
-    actor_rollout_ref.actor.fsdp_config.optimizer_offload=false \
+    actor_rollout_ref.actor.fsdp_config.param_offload=true \
+    actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=${ROLLOUT_GPUS} \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.5 \
     actor_rollout_ref.rollout.temperature=0.7 \
     actor_rollout_ref.rollout.top_p=0.9 \
-    actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.n=${ROLLOUT_N} \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=8 \
-    actor_rollout_ref.ref.fsdp_config.param_offload=false \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
+    actor_rollout_ref.ref.fsdp_config.param_offload=true \
     reward_model.enable=false \
     custom_reward_function.path=train/reward_function.py \
     custom_reward_function.name=compute_reward \
@@ -135,9 +155,11 @@ python3 -m verl.trainer.main_ppo \
     trainer.val_only=false \
     trainer.test_freq=20 \
     trainer.save_freq=50 \
-    trainer.use_legacy_worker_impl=auto \
     trainer.project_name=ustc-qa-grpo \
-    trainer.n_gpus_per_node="${NUM_GPUS}" \
+    trainer.nnodes=1 \
+    trainer.n_gpus_per_node=${TRAIN_GPUS} \
+    rollout.nnodes=1 \
+    rollout.n_gpus_per_node=${ROLLOUT_GPUS} \
     trainer.experiment_name="grpo-$(date +%Y%m%d-%H%M%S)" \
     trainer.default_local_dir="${PROJECT_DIR}/outputs/ustc-qa-grpo" \
     'trainer.logger=["console"]'
