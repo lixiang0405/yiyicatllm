@@ -88,34 +88,19 @@ sleep 3
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # ============================================
-# 使用 veRL one_step_off_policy 异步模式
-# 训练和推理分离到不同 GPU，避免 hybrid engine 的 vLLM v1 兼容性问题
-# GPU 0: Actor 训练 (FSDP2 + LoRA)
-# GPU 1: vLLM 独立推理 (rollout)
+# veRL + vLLM 0.8+ (V1 engine) 配置
+# 关键：需要 enforce_eager=False + free_cache_engine=True
+# 参考：https://github.com/volcengine/verl/blob/main/docs/README_vllm0.8.md
 # ============================================
 
-# 训练卡数 = 总卡数 - 推理卡数
-ROLLOUT_GPUS=1
-TRAIN_GPUS=$((NUM_GPUS - ROLLOUT_GPUS))
-if [ "${TRAIN_GPUS}" -lt 1 ]; then
-    TRAIN_GPUS=1
-    ROLLOUT_GPUS=1
-fi
-echo "  训练 GPU: ${TRAIN_GPUS} 张 | 推理 GPU: ${ROLLOUT_GPUS} 张"
-
-# train_batch_size 必须能被 TRAIN_GPUS 整除
-# rollout.n * train_batch_size 必须能被 TRAIN_GPUS 整除
-TRAIN_BATCH_SIZE=16
-ROLLOUT_N=4
-
-python3 -m verl.experimental.one_step_off_policy.async_main_ppo \
-    --config-name="one_step_off_ppo_trainer" \
+python3 -m verl.trainer.main_ppo \
+    --config-name="ppo_trainer" \
     data.train_files="${GRPO_DATA}" \
     data.val_files="${PROJECT_DIR}/data/grpo_eval.parquet" \
     data.prompt_key=prompt \
     data.max_prompt_length=256 \
     data.max_response_length=256 \
-    data.train_batch_size=${TRAIN_BATCH_SIZE} \
+    data.train_batch_size=16 \
     data.trust_remote_code=true \
     actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
     actor_rollout_ref.model.trust_remote_code=true \
@@ -123,9 +108,7 @@ python3 -m verl.experimental.one_step_off_policy.async_main_ppo \
     actor_rollout_ref.model.lora_rank=32 \
     actor_rollout_ref.model.lora_alpha=64 \
     actor_rollout_ref.model.target_modules=all-linear \
-    actor_rollout_ref.hybrid_engine=false \
-    actor_rollout_ref.actor.strategy=fsdp2 \
-    actor_rollout_ref.actor.ppo_mini_batch_size=${TRAIN_BATCH_SIZE} \
+    actor_rollout_ref.actor.ppo_mini_batch_size=16 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.actor.ppo_epochs=1 \
     actor_rollout_ref.actor.use_kl_loss=true \
@@ -138,11 +121,13 @@ python3 -m verl.experimental.one_step_off_policy.async_main_ppo \
     actor_rollout_ref.actor.fsdp_config.param_offload=true \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=${ROLLOUT_GPUS} \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.5 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+    actor_rollout_ref.rollout.enforce_eager=false \
+    actor_rollout_ref.rollout.free_cache_engine=true \
     actor_rollout_ref.rollout.temperature=0.7 \
     actor_rollout_ref.rollout.top_p=0.9 \
-    actor_rollout_ref.rollout.n=${ROLLOUT_N} \
+    actor_rollout_ref.rollout.n=4 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.ref.fsdp_config.param_offload=true \
@@ -156,10 +141,7 @@ python3 -m verl.experimental.one_step_off_policy.async_main_ppo \
     trainer.test_freq=20 \
     trainer.save_freq=50 \
     trainer.project_name=ustc-qa-grpo \
-    trainer.nnodes=1 \
-    trainer.n_gpus_per_node=${TRAIN_GPUS} \
-    rollout.nnodes=1 \
-    rollout.n_gpus_per_node=${ROLLOUT_GPUS} \
+    trainer.n_gpus_per_node="${NUM_GPUS}" \
     trainer.experiment_name="grpo-$(date +%Y%m%d-%H%M%S)" \
     trainer.default_local_dir="${PROJECT_DIR}/outputs/ustc-qa-grpo" \
     'trainer.logger=["console"]'
