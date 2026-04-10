@@ -8,8 +8,8 @@ veRL 要求:
   - 示例: {"prompt": "[{\"role\": \"user\", \"content\": \"...\"}]"}
 
 数据来源:
-  - new_qa.json (SFT 训练数据, ~2940 条)
-  - preference_data.json (DPO 偏好数据, ~1262 条)
+  - new_qa.json (SFT 训练数据)
+  - dpo_train_data.json (DPO 训练数据，已去除验证集部分)
   合并去重后提取所有不重复的问题作为 GRPO prompt
 """
 
@@ -82,8 +82,8 @@ def main():
     parser.add_argument(
         "--pref-data",
         type=str,
-        default="data/preference_data.json",
-        help="DPO 偏好数据路径",
+        default="data/dpo_train_data.json",
+        help="DPO 训练数据路径（已去除验证集部分）",
     )
     parser.add_argument(
         "--output",

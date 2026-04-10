@@ -28,44 +28,35 @@ if [ ! -d "${LLAMA_FACTORY_DIR}" ]; then
     exit 1
 fi
 
-# --- Step 0.5: 分割偏好数据 (验证集 + DPO训练集) ---
-echo "[0/6] 分割数据（训练集 + 验证集 + DPO训练集）..."
+# --- Step 0.5: 从偏好数据中切分公共验证集 ---
+echo "[0/6] 从偏好数据中切分公共验证集..."
 python3 -c "
 import json, random
 
 random.seed(42)
 
-# 1. 从训练数据中切分 SFT 验证集（保证分布一致）
-with open('${DATA_FILE}', 'r') as f:
-    train_data = json.load(f)
+# 从偏好数据中切分 200~300 条作为公共验证集（SFT + DPO 共用）
+with open('${PREF_DATA_FILE}', 'r') as f:
+    pref_data = json.load(f)
 
-total = len(train_data)
-eval_size = min(200, total // 10)  # 最多200条，或总量的10%
+total = len(pref_data)
+eval_size = min(300, max(200, total // 10))  # 200~300 条，或总量的 10%
 
-random.shuffle(train_data)
-sft_eval_data = train_data[:eval_size]
-sft_train_data = train_data[eval_size:]
+random.shuffle(pref_data)
+eval_data = pref_data[:eval_size]
+dpo_train_data = pref_data[eval_size:]
 
-# 保存 SFT 验证集（和训练集同格式同分布）
+# 保存公共验证集（SFT 阶段用 output 做验证，DPO 阶段 generate_rejected 后用 chosen/rejected 做验证）
 with open('${EVAL_DATA_FILE}', 'w') as f:
-    json.dump(sft_eval_data, f, indent=2, ensure_ascii=False)
+    json.dump(eval_data, f, indent=2, ensure_ascii=False)
 
-# 覆盖训练数据（去掉验证集部分）
-with open('${DATA_FILE}', 'w') as f:
-    json.dump(sft_train_data, f, indent=2, ensure_ascii=False)
+# 保存 DPO 训练数据（去掉验证集部分）
+with open('${DPO_TRAIN_DATA_FILE}', 'w') as f:
+    json.dump(dpo_train_data, f, indent=2, ensure_ascii=False)
 
-print(f'  SFT 训练数据: {total} 条 → 训练 {len(sft_train_data)} 条 + 验证 {eval_size} 条')
-
-# 2. 分割偏好数据（DPO 阶段用）
-try:
-    with open('${PREF_DATA_FILE}', 'r') as f:
-        pref_data = json.load(f)
-    random.shuffle(pref_data)
-    with open('${DPO_TRAIN_DATA_FILE}', 'w') as f:
-        json.dump(pref_data, f, indent=2, ensure_ascii=False)
-    print(f'  DPO 训练数据: {len(pref_data)} 条 -> ${DPO_TRAIN_DATA_FILE}')
-except FileNotFoundError:
-    print('  [WARN] 偏好数据不存在，DPO 阶段将不可用')
+print(f'  偏好数据: {total} 条 → DPO 训练 {len(dpo_train_data)} 条 + 公共验证 {eval_size} 条')
+print(f'  公共验证集: ${EVAL_DATA_FILE}')
+print(f'  DPO 训练集: ${DPO_TRAIN_DATA_FILE}')
 "
 
 # --- Step 1: 注册数据集到 LLaMA-Factory ---

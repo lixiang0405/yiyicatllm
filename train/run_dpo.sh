@@ -49,7 +49,7 @@ info['ustc_qa_preference'] = {
     'columns': {
         'prompt': 'instruction',
         'query': 'input',
-        'chosen': 'chosen',
+        'chosen': 'output',
         'rejected': 'rejected'
     }
 }
@@ -59,7 +59,7 @@ info['ustc_qa_preference_eval'] = {
     'columns': {
         'prompt': 'instruction',
         'query': 'input',
-        'chosen': 'chosen',
+        'chosen': 'output',
         'rejected': 'rejected'
     }
 }
