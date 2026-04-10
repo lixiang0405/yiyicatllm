@@ -85,8 +85,28 @@ actor_rollout_ref:
 # ============================================
 # ============================================
 # Reward 配置（规则奖励，不需要 Reward Model）
-# 以下字段为 veRL 新版 migrate_legacy_reward_impl 所需
 # ============================================
+
+# 新版 veRL 的 reward 配置（迁移目标）
+reward:
+  num_workers: 1
+  reward_manager:
+    name: null
+    source: null
+    module:
+      path: null
+      name: null
+  custom_reward_function:
+    path: train/reward_function.py
+    name: compute_reward
+  reward_model:
+    enable: false
+    model_path: null
+    rollout: {}
+  reward_kwargs: {}
+  sandbox_fusion: {}
+
+# 旧版兼容字段（migrate_legacy_reward_impl 会读取并迁移到 reward 下）
 reward_model:
   enable: false
   enable_resource_pool: null
@@ -104,8 +124,8 @@ reward_model:
   rollout: {}
 
 custom_reward_function:
-  path: train/reward_function.py            # 自定义奖励函数路径
-  name: compute_reward                      # 入口函数名
+  path: train/reward_function.py
+  name: compute_reward
 
 sandbox_fusion:
   enable: null
