@@ -28,7 +28,7 @@ do_train: true
 finetuning_type: lora
 
 ### DPO 特有配置
-pref_beta: 0.1          # DPO 的 beta 参数，控制偏好强度 (越大越保守)
+pref_beta: 0.1          # DPO 的 beta 参数，控制偏好强度
 pref_loss: sigmoid       # DPO loss 类型: sigmoid (原始 DPO)
 
 ### LoRA 配置 (与 SFT 保持一致)
@@ -58,7 +58,7 @@ eval_strategy: steps
 ### 训练超参数
 per_device_train_batch_size: 2       # DPO 需要同时加载 chosen+rejected，显存占用翻倍，降低 batch
 gradient_accumulation_steps: 4       # 有效batch_size = 2 × 4 × 2卡 = 16
-learning_rate: 3.0e-5                # DPO lr 应比 SFT 低，避免偏好信号过强冲淡知识
+learning_rate: 5.0e-6                # DPO lr 要低，防止 loss 下降过快导致过拟合
 num_train_epochs: 1                  # 1 轮即可，避免过拟合（rejected 质量提高后偏好信号更密集）
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
