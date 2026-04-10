@@ -84,8 +84,7 @@ sleep 2
 python3 -m verl.trainer.main_ppo \
     --config-name="ppo_trainer" \
     data.train_files="${GRPO_DATA}" \
-    data.val_files=null \
-    data.prompt_key=prompt \
+    data.val_files="${GRPO_DATA}" \    data.prompt_key=prompt \
     data.max_prompt_length=512 \
     data.max_response_length=512 \
     data.train_batch_size=32 \
