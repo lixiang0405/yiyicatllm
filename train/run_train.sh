@@ -81,7 +81,7 @@ info['ustc_qa_eval'] = {
     'columns': {
         'prompt': 'instruction',
         'query': 'input',
-        'response': 'output'
+        'response': 'chosen'
     }
 }
 with open('${DATASET_INFO}', 'w') as f:
