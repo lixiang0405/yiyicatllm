@@ -1,4 +1,3 @@
-## DPO 偏好数据生成提示词
 
 ### 任务说明
 
@@ -69,6 +68,7 @@
 5. input 字段固定为空字符串 ""
 6. 确保输出是合法的 JSON 格式
 7. 使用file_replace输出，不允许使用python脚本，一批一批读取然后改写，每批10-20条QA对，创建任务流进行
+8. 注意格式，输出的文本 " 之前记得转义 /
 ### 待处理的原始数据
 
-请对/Users/yiyicat/yiyicat-llm/data/qa_pairs.json的第1行到第1000行数据逐条进行变体改写，输出到/Users/yiyicat/yiyicat-llm/data/dpo_line_data/preference_data_0001_1000.json里面
+请阅读/Users/yiyicat/yiyicat-llm/data/dpo_line_data/qa_batch_01_0001_0200.json所有数据逐条进行变体改写，输出到/Users/yiyicat/yiyicat-llm/data/dpo_line_data/preference_data_01_0001_0200.json里面

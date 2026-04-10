@@ -29,38 +29,44 @@ if [ ! -d "${LLAMA_FACTORY_DIR}" ]; then
 fi
 
 # --- Step 0.5: 分割偏好数据 (验证集 + DPO训练集) ---
-echo "[0/6] 分割偏好数据..."
-if [ -f "${PREF_DATA_FILE}" ]; then
-    python3 -c "
+echo "[0/6] 分割数据（训练集 + 验证集 + DPO训练集）..."
+python3 -c "
 import json, random
 
-with open('${PREF_DATA_FILE}', 'r') as f:
-    pref_data = json.load(f)
-
-total = len(pref_data)
-eval_size = min(200, total // 5)  # 最多200条，或总量的20%
-
 random.seed(42)
-random.shuffle(pref_data)
 
-eval_data = pref_data[:eval_size]
-train_data = pref_data[eval_size:]
+# 1. 从训练数据中切分 SFT 验证集（保证分布一致）
+with open('${DATA_FILE}', 'r') as f:
+    train_data = json.load(f)
 
-# 保存验证集（完整偏好格式，SFT阶段用chosen作response，DPO阶段用完整偏好对）
+total = len(train_data)
+eval_size = min(200, total // 10)  # 最多200条，或总量的10%
+
+random.shuffle(train_data)
+sft_eval_data = train_data[:eval_size]
+sft_train_data = train_data[eval_size:]
+
+# 保存 SFT 验证集（和训练集同格式同分布）
 with open('${EVAL_DATA_FILE}', 'w') as f:
-    json.dump(eval_data, f, indent=2, ensure_ascii=False)
+    json.dump(sft_eval_data, f, indent=2, ensure_ascii=False)
 
-# 保存DPO训练集
-with open('${DPO_TRAIN_DATA_FILE}', 'w') as f:
-    json.dump(train_data, f, indent=2, ensure_ascii=False)
+# 覆盖训练数据（去掉验证集部分）
+with open('${DATA_FILE}', 'w') as f:
+    json.dump(sft_train_data, f, indent=2, ensure_ascii=False)
 
-print(f'  偏好数据总量: {total} 条')
-print(f'  验证集: {eval_size} 条 -> ${EVAL_DATA_FILE}')
-print(f'  DPO训练集: {len(train_data)} 条 -> ${DPO_TRAIN_DATA_FILE}')
+print(f'  SFT 训练数据: {total} 条 → 训练 {len(sft_train_data)} 条 + 验证 {eval_size} 条')
+
+# 2. 分割偏好数据（DPO 阶段用）
+try:
+    with open('${PREF_DATA_FILE}', 'r') as f:
+        pref_data = json.load(f)
+    random.shuffle(pref_data)
+    with open('${DPO_TRAIN_DATA_FILE}', 'w') as f:
+        json.dump(pref_data, f, indent=2, ensure_ascii=False)
+    print(f'  DPO 训练数据: {len(pref_data)} 条 -> ${DPO_TRAIN_DATA_FILE}')
+except FileNotFoundError:
+    print('  [WARN] 偏好数据不存在，DPO 阶段将不可用')
 "
-else
-    echo "  [WARN] 偏好数据不存在: ${PREF_DATA_FILE}，跳过分割"
-fi
 
 # --- Step 1: 注册数据集到 LLaMA-Factory ---
 echo "[1/6] 注册数据集..."
@@ -84,7 +90,7 @@ info['ustc_qa_eval'] = {
     'columns': {
         'prompt': 'instruction',
         'query': 'input',
-        'response': 'chosen'
+        'response': 'output'
     }
 }
 with open('${DATASET_INFO}', 'w') as f:

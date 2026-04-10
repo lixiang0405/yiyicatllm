@@ -27,7 +27,7 @@ data:
   prompt_key: prompt                        # parquet 中 prompt 字段名
   max_prompt_length: 512
   max_response_length: 512
-  train_batch_size: 128                     # 每轮采样的 prompt 数量
+  train_batch_size: 64                      # 2×5090 显存有限，降低采样 batch
   shuffle: true
   seed: 42
   trust_remote_code: true
@@ -45,19 +45,19 @@ actor_rollout_ref:
 
   actor:
     strategy: fsdp                          # 并行策略
-    ppo_mini_batch_size: 64                 # PPO/GRPO mini-batch 大小
-    ppo_micro_batch_size_per_gpu: 4         # 每 GPU 的 micro-batch
+    ppo_mini_batch_size: 32                 # 数据量更大，mini-batch 适当缩小保证更新频率
+    ppo_micro_batch_size_per_gpu: 2         # 2×5090 显存有限，降低 micro-batch
     ppo_epochs: 1                           # 每批数据的更新轮数
     clip_ratio: 0.2                         # PPO clip 比率
     entropy_coeff: 0.01                     # 熵正则化系数
     grad_clip: 1.0
     use_kl_loss: true                       # GRPO 使用 KL loss (不在 reward 中加 KL)
-    kl_loss_coef: 0.001                     # KL loss 系数
+    kl_loss_coef: 0.002                     # 稍微增大 KL 系数，防止偏离 SFT+DPO 太远
     kl_loss_type: low_var_kl                # KL 散度计算方式
     use_torch_compile: false                # 7B 模型关闭 compile 更稳定
     optim:
-      lr: 1.0e-6                            # GRPO 学习率通常很小
-      lr_warmup_steps: 10
+      lr: 5.0e-7                            # 经过 SFT+DPO 后 GRPO lr 应更保守
+      lr_warmup_steps: 20                   # 数据量更大，warmup 步数增加
       lr_scheduler_type: constant
       weight_decay: 0.01
     fsdp_config:
