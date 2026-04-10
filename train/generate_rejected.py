@@ -27,11 +27,20 @@ import time
 from pathlib import Path
 
 
+SYSTEM_PROMPT = (
+    "你是一个通用的AI助手，请简洁地回答用户的问题。"
+    "回答要简短，不需要太详细，给出关键信息即可。"
+)
+
+
 def build_prompts(tokenizer, questions):
-    """构建不带 system prompt 的 chat 格式 prompt"""
+    """构建带通用 system prompt 的 chat 格式 prompt（生成质量接近但不够详细的回答）"""
     prompts = []
     for question in questions:
-        messages = [{"role": "user", "content": question}]
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": question},
+        ]
         prompt = tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
@@ -58,6 +67,11 @@ def main():
         type=str,
         default="data/preference_data.json",
         help="输出文件路径（默认覆盖原文件）",
+    )
+    parser.add_argument(
+        "--force-regenerate",
+        action="store_true",
+        help="强制清空所有已有的 rejected，从头重新生成",
     )
     parser.add_argument(
         "--batch-size",
@@ -88,6 +102,12 @@ def main():
     with open(args.data, "r", encoding="utf-8") as f:
         data = json.load(f)
     total = len(data)
+
+    # 强制清空已有 rejected
+    if args.force_regenerate:
+        for item in data:
+            item["rejected"] = ""
+        print(f"  已清空所有 rejected（--force-regenerate）")
 
     # 统计需要生成的数量
     need_generate = [i for i, item in enumerate(data) if not item.get("rejected", "").strip()]
@@ -121,10 +141,20 @@ def main():
         dtype="bfloat16",
         gpu_memory_utilization=0.85,
     )
+    # 获取 stop token（Qwen 的 <|im_end|> 等）
+    stop_token_ids = []
+    for token_str in ["<|im_end|>", "<|endoftext|>"]:
+        token_id = tokenizer.convert_tokens_to_ids(token_str)
+        if token_id is not None and token_id != tokenizer.unk_token_id:
+            stop_token_ids.append(token_id)
+
     sampling_params = SamplingParams(
-        temperature=0,              # 贪心解码，结果可复现
+        temperature=0.7,            # 适度采样，生成多样但不至于乱码
+        top_p=0.85,
         max_tokens=args.max_new_tokens,
-        repetition_penalty=1.1,
+        repetition_penalty=1.3,     # 加强重复惩罚，防止重复乱码
+        seed=42,                    # 固定种子保证可复现
+        stop_token_ids=stop_token_ids if stop_token_ids else None,
     )
     print(f"  vLLM 模型加载完成")
 

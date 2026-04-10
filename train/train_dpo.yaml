@@ -59,7 +59,7 @@ eval_strategy: steps
 per_device_train_batch_size: 2       # DPO 需要同时加载 chosen+rejected，显存占用翻倍，降低 batch
 gradient_accumulation_steps: 4       # 有效batch_size = 2 × 4 × 2卡 = 16
 learning_rate: 3.0e-5                # DPO lr 应比 SFT 低，避免偏好信号过强冲淡知识
-num_train_epochs: 3                  # DPO 不需要太多 epoch，2-3 轮足够学到偏好
+num_train_epochs: 1                  # 1 轮即可，避免过拟合（rejected 质量提高后偏好信号更密集）
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
 max_grad_norm: 1.0
