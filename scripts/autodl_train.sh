@@ -105,54 +105,48 @@ install_with_retry pandas pyarrow
 echo ""
 echo "  安装 vLLM + veRL (GRPO 强化学习)..."
 
-# AutoDL 学术加速：开启后可快速访问 GitHub/PyPI
-if [ -f /etc/network_turbo ]; then
-    echo "  → 开启 AutoDL 学术资源加速..."
-    source /etc/network_turbo 2>/dev/null || true
-fi
-
-# ---- 快速安装 vLLM ----
-# 策略：先检查是否已安装，未安装则按优先级尝试多种方式
-# 1) vLLM 官方 nightly wheel（最快，直接下载预编译包）
-# 2) PyPI 官方源
-echo "  → 安装 vLLM..."
+# 使用阿里云源安装 vLLM
+echo "  → 安装 vLLM（阿里云源）..."
 if python3 -c "import vllm" 2>/dev/null; then
     echo "  ✅ vLLM 已安装，跳过"
 else
-    # 方式1: 从 vLLM 官方 wheel 仓库直接安装预编译包（速度最快）
-    echo "  → 尝试从 vLLM 官方 wheel 仓库安装（预编译，最快）..."
-    CUDA_VERSION=$(python3 -c "import torch; print(torch.version.cuda.replace('.','')[:3])" 2>/dev/null || echo "128")
-    PY_VERSION=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')" 2>/dev/null || echo "cp312")
-    pip install vllm --pre --extra-index-url https://wheels.vllm.ai/nightly --timeout 300 --retries 5 2>&1 | tail -5 && \
-        echo "  ✅ vLLM 从官方 wheel 安装成功" || {
-        # 方式2: PyPI 官方源
-        echo "  → wheel 安装失败，尝试 PyPI 官方源..."
-        pip install vllm -i https://pypi.org/simple --trusted-host pypi.org --timeout 600 --retries 10 2>&1 | tail -5 || \
-            echo "  ⚠️  vLLM 安装失败，GRPO 阶段将不可用（SFT/DPO 不受影响）"
-    }
+    install_with_retry vllm
 fi
 
-# ---- 快速安装 veRL ----
-echo "  → 安装 veRL..."
+# 使用阿里云源安装 veRL（--no-deps 避免 veRL 升级 torch 导致版本冲突）
+echo "  → 安装 veRL（阿里云源）..."
 if python3 -c "import verl" 2>/dev/null; then
     echo "  ✅ veRL 已安装，跳过"
 else
-    pip install verl -i https://pypi.org/simple --trusted-host pypi.org --timeout 600 --retries 10 2>&1 | tail -5 || \
-        echo "  ⚠️  veRL 安装失败，GRPO 阶段将不可用（SFT/DPO 不受影响）"
+    install_with_retry verl --no-deps
+    # 补装 veRL 的轻量依赖（排除 torch，保留镜像自带版本）
+    install_with_retry codetiming ray
 fi
 
-# 关闭学术加速（避免影响后续国内源下载）
-if [ -f /etc/network_turbo ]; then
-    unset http_proxy https_proxy no_proxy HTTP_PROXY HTTPS_PROXY NO_PROXY 2>/dev/null || true
-    echo "  → 已关闭学术加速，恢复国内源"
+# 修复 torch 版本：veRL 可能将 torch 升级导致与 vLLM/torchvision 冲突
+EXPECTED_TORCH="2.10.0"
+CURRENT_TORCH=$(python3 -c "import torch; print(torch.__version__.split('+')[0])" 2>/dev/null || echo "unknown")
+if [ "${CURRENT_TORCH}" != "${EXPECTED_TORCH}" ]; then
+    echo "  → 修复 torch 版本冲突（${CURRENT_TORCH} → ${EXPECTED_TORCH}）..."
+    install_with_retry "torch==${EXPECTED_TORCH}" "torchvision==0.25.0" "torchaudio==${EXPECTED_TORCH}"
 fi
+
+# 清理 AutoDL 镜像中 PyTorch 残留的损坏安装记录（消除 ~orch warning）
+rm -rf /root/miniconda3/lib/python3.12/site-packages/~orch 2>/dev/null || true
 
 # 验证安装
-echo "  → 验证 vLLM + veRL 安装..."
-python3 -c "import vllm; print(f'  ✅ vLLM {vllm.__version__}')" 2>/dev/null || \
-    echo "  ⚠️  vLLM 未安装成功，GRPO 阶段将不可用"
-python3 -c "import verl; print('  ✅ veRL 安装成功')" 2>/dev/null || \
-    echo "  ⚠️  veRL 未安装成功，GRPO 阶段将不可用"
+echo "  → 验证 vLLM + veRL + torch 安装..."
+python3 -c "
+import torch, sys
+print(f'  torch:  {torch.__version__}  CUDA={torch.version.cuda}  GPU={torch.cuda.device_count()}')
+try:
+    import vllm; print(f'  vLLM:   {vllm.__version__}  ✅')
+except Exception as e: print(f'  vLLM:   ❌ {e}')
+try:
+    import verl; print(f'  veRL:   已安装  ✅')
+except Exception as e: print(f'  veRL:   ❌ {e}')
+import numpy; print(f'  numpy:  {numpy.__version__}')
+"
 echo ""
 echo "  安装 LLaMA-Factory..."
 if [ ! -d "${PROJECT_DIR}/LLaMA-Factory" ]; then
