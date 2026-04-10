@@ -74,13 +74,17 @@ pip config set global.retries 10 2>/dev/null || true
 # pip 安装通用参数
 PIP_OPTS="--timeout 600 --retries 10 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com"
 
+# 清理 AutoDL 镜像中 PyTorch 残留的损坏安装记录（消除 ~orch warning）
+rm -rf /root/miniconda3/lib/python3.12/site-packages/~orch 2>/dev/null || true
+
 # 带重试的安装函数：失败后自动重试最多3次
 install_with_retry() {
     local max_attempts=3
     local attempt=1
     while [ $attempt -le $max_attempts ]; do
         echo "  → 安装尝试 $attempt/$max_attempts: $@"
-        if pip install $PIP_OPTS "$@" 2>&1 | tail -5; then
+        # 使用 pipefail 确保 pip 报错时整条管道返回非零
+        if bash -c "set -o pipefail; pip install $PIP_OPTS $* 2>&1 | tail -5"; then
             echo "  ✅ 安装成功"
             return 0
         fi
@@ -92,12 +96,14 @@ install_with_retry() {
     return 1
 }
 
-# AutoDL 镜像已自带 PyTorch，拆分安装其他依赖（避免一次下载太多超时）
+# AutoDL 镜像已自带 PyTorch（+cu128 版本阿里云源没有），安装时跳过 torch 依赖检查
 echo "  安装基础依赖 (transformers, datasets, accelerate, peft)..."
-install_with_retry "transformers>=4.46.0" "datasets>=3.0.0" "accelerate>=1.0.0" "peft>=0.13.0"
+pip install $PIP_OPTS --no-deps "transformers>=4.46.0" "accelerate>=1.0.0" 2>&1 | tail -3
+install_with_retry "datasets>=3.0.0" "peft>=0.13.0"
 
 echo "  安装训练框架 (trl, deepspeed)..."
-install_with_retry "trl>=0.12.0" "deepspeed>=0.15.0"
+pip install $PIP_OPTS --no-deps "trl>=0.12.0" "deepspeed>=0.15.0" 2>&1 | tail -3
+echo "  ✅ 训练框架安装完成"
 
 echo "  安装数据处理 (pandas, pyarrow)..."
 install_with_retry pandas pyarrow
@@ -124,15 +130,33 @@ else
 fi
 
 # 修复 torch 版本：veRL 可能将 torch 升级导致与 vLLM/torchvision 冲突
-EXPECTED_TORCH="2.10.0"
 CURRENT_TORCH=$(python3 -c "import torch; print(torch.__version__.split('+')[0])" 2>/dev/null || echo "unknown")
-if [ "${CURRENT_TORCH}" != "${EXPECTED_TORCH}" ]; then
-    echo "  → 修复 torch 版本冲突（${CURRENT_TORCH} → ${EXPECTED_TORCH}）..."
-    install_with_retry "torch==${EXPECTED_TORCH}" "torchvision==0.25.0" "torchaudio==${EXPECTED_TORCH}"
+if [ "${CURRENT_TORCH}" != "2.10.0" ]; then
+    echo "  → 修复 torch 版本冲突（${CURRENT_TORCH} → 2.10.0）..."
+    pip install "torch==2.10.0" "torchvision==0.25.0" "torchaudio==2.10.0" \
+        -i https://mirrors.aliyun.com/pypi/simple/ --timeout 300 2>&1 | tail -5
 fi
 
-# 清理 AutoDL 镜像中 PyTorch 残留的损坏安装记录（消除 ~orch warning）
-rm -rf /root/miniconda3/lib/python3.12/site-packages/~orch 2>/dev/null || true
+# 修复 PyTorch 2.10+ lr_scheduler 与 DeepSpeed+LoRA 的兼容性问题
+# PyTorch 2.10 在 _update_lr 中新增 zip(..., strict=True)，
+# 但 DeepSpeed 会修改 optimizer.param_groups 导致数量不匹配而报错
+echo "  → 修复 PyTorch lr_scheduler 兼容性..."
+python3 -c "
+import torch, os
+path = os.path.join(os.path.dirname(torch.__file__), 'optim', 'lr_scheduler.py')
+with open(path, 'r') as f:
+    content = f.read()
+old = 'for param_group, lr in zip(self.optimizer.param_groups, values, strict=True):'
+new = 'for param_group, lr in zip(self.optimizer.param_groups, values):'
+if old in content:
+    with open(path, 'w') as f:
+        f.write(content.replace(old, new))
+    print('  ✅ lr_scheduler strict=True 已修复')
+elif new in content:
+    print('  ✅ lr_scheduler 已修复过，跳过')
+else:
+    print('  ⚠️  未找到目标代码，可能 PyTorch 版本不同')
+"
 
 # 验证安装
 echo "  → 验证 vLLM + veRL + torch 安装..."
