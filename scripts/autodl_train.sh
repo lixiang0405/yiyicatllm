@@ -103,15 +103,25 @@ echo "  安装数据处理 (pandas, pyarrow)..."
 install_with_retry pandas pyarrow
 
 echo ""
-echo "  安装 veRL + vLLM (GRPO 强化学习)..."
-# vLLM 在阿里云镜像中没有，必须用 PyPI 官方源或清华源
-echo "  → vLLM 使用 PyPI 官方源安装（阿里云镜像无此包）..."
-pip install vllm --timeout 600 --retries 10 2>&1 | tail -5 || \
-    pip install vllm -i https://pypi.tuna.tsinghua.edu.cn/simple --timeout 600 --retries 10 2>&1 | tail -5 || \
+echo "  安装 vLLM + veRL (GRPO 强化学习)..."
+# vLLM 在阿里云镜像中没有，使用清华源加速下载
+echo "  → vLLM 使用清华源安装（阿里云镜像无此包）..."
+pip install vllm \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    --trusted-host pypi.tuna.tsinghua.edu.cn \
+    --timeout 600 --retries 10 2>&1 | tail -5 || \
+    pip install vllm --timeout 600 --retries 10 2>&1 | tail -5 || \
     echo "  ⚠️  vLLM 安装失败，GRPO 阶段将不可用（SFT/DPO 不受影响）"
 
-# 再装 veRL
+# 安装 veRL
 install_with_retry verl
+
+# 验证 vLLM + veRL 安装
+echo "  → 验证 vLLM + veRL 安装..."
+python3 -c "import vllm; print(f'  ✅ vLLM 安装成功: {vllm.__version__}')" 2>/dev/null || \
+    echo "  ⚠️  vLLM 未安装成功，GRPO 阶段将不可用"
+python3 -c "import verl; print(f'  ✅ veRL 安装成功')" 2>/dev/null || \
+    echo "  ⚠️  veRL 未安装成功，GRPO 阶段将不可用"
 echo ""
 echo "  安装 LLaMA-Factory..."
 if [ ! -d "${PROJECT_DIR}/LLaMA-Factory" ]; then
