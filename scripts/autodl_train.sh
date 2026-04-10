@@ -280,9 +280,9 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 python3 train/merge_lora.py \
     --base-model "${MODEL_LOCAL_DIR}" \
     --lora-adapter outputs/ustc-qa-lora \
-    --output outputs/ustc-qa-merged
+    --output /root/autodl-tmp/ustc-qa-merged
 
-echo "  ✅ SFT LoRA 合并完成: outputs/ustc-qa-merged"
+echo "  ✅ SFT LoRA 合并完成: /root/autodl-tmp/ustc-qa-merged"
 
 # ==========================================
 # Step 7: 生成 DPO rejected 回答
