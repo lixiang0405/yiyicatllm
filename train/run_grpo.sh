@@ -89,8 +89,8 @@ python3 -m verl.trainer.main_ppo \
     data.train_files="${GRPO_DATA}" \
     data.val_files="${PROJECT_DIR}/data/grpo_eval.parquet" \
     data.prompt_key=prompt \
-    data.max_prompt_length=512 \
-    data.max_response_length=512 \
+    data.max_prompt_length=256 \
+    data.max_response_length=256 \
     data.train_batch_size=64 \
     data.trust_remote_code=true \
     actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
@@ -110,12 +110,12 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=false \
     actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.3 \
     actor_rollout_ref.rollout.temperature=0.7 \
     actor_rollout_ref.rollout.top_p=0.9 \
     actor_rollout_ref.rollout.n=4 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=8 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.ref.fsdp_config.param_offload=false \
     reward_model.enable=false \
     custom_reward_function.path=train/reward_function.py \
