@@ -38,7 +38,7 @@ data:
 actor_rollout_ref:
   hybrid_engine: true
   model:
-    path: outputs/ustc-qa-dpo-merged        # DPO 合并后的模型 (命令行可覆盖)
+    path: /root/autodl-tmp/ustc-qa-dpo-merged  # DPO 合并后的模型 (命令行可覆盖)
     trust_remote_code: true
     override_config:
       attn_implementation: flash_attention_2

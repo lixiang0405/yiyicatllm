@@ -25,7 +25,7 @@ set -e
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 VERL_CONFIG="${PROJECT_DIR}/train/verl_config.yaml"
-DPO_MODEL_PATH="${PROJECT_DIR}/outputs/ustc-qa-dpo-merged"
+DPO_MODEL_PATH="/root/autodl-tmp/ustc-qa-dpo-merged"
 GRPO_DATA="${PROJECT_DIR}/data/grpo_prompts.parquet"
 
 echo "=========================================="
@@ -43,7 +43,7 @@ fi
 if [ ! -d "${DPO_MODEL_PATH}" ]; then
     echo "[WARNING] DPO 合并模型不存在: ${DPO_MODEL_PATH}"
     # 回退到 SFT 合并模型
-    DPO_MODEL_PATH="${PROJECT_DIR}/outputs/ustc-qa-merged"
+    DPO_MODEL_PATH="/root/autodl-tmp/ustc-qa-merged"
     if [ ! -d "${DPO_MODEL_PATH}" ]; then
         echo "[ERROR] SFT 合并模型也不存在，请先完成 SFT + DPO 训练流程"
         exit 1

@@ -22,7 +22,7 @@ echo "  中科大智能问答助手 - DPO 偏好对齐训练"
 echo "=========================================="
 
 # --- 检查 SFT 合并模型是否存在 ---
-if [ ! -d "outputs/ustc-qa-merged" ]; then
+if [ ! -d "/root/autodl-tmp/ustc-qa-merged" ]; then
     echo "[ERROR] SFT 合并模型不存在，请先运行:"
     echo "  1. bash train/run_train.sh        (SFT 微调)"
     echo "  2. python train/merge_lora.py     (合并 LoRA 权重)"
@@ -108,7 +108,7 @@ echo "  DPO LoRA 权重保存至: outputs/ustc-qa-dpo"
 echo ""
 echo "  下一步: 合并 DPO LoRA 权重"
 echo "  python train/merge_lora.py \\"
-echo "      --base-model outputs/ustc-qa-merged \\"
+echo "      --base-model /root/autodl-tmp/ustc-qa-merged \\"
 echo "      --lora-adapter outputs/ustc-qa-dpo \\"
-echo "      --output outputs/ustc-qa-dpo-merged"
+echo "      --output /root/autodl-tmp/ustc-qa-dpo-merged"
 echo "=========================================="

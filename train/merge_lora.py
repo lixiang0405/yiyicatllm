@@ -89,8 +89,8 @@ def main():
     parser.add_argument(
         "--output",
         type=str,
-        default="outputs/ustc-qa-merged",
-        help="合并后模型的输出路径",
+        default="/root/autodl-tmp/ustc-qa-merged",
+        help="合并后模型的输出路径（默认保存到数据盘，避免系统盘空间不足）",
     )
     parser.add_argument(
         "--dtype",

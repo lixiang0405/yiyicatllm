@@ -108,7 +108,7 @@ def main():
     parser.add_argument(
         "--model-path",
         type=str,
-        default="outputs/ustc-qa-merged",
+        default="/root/autodl-tmp/ustc-qa-merged",
         help="合并后模型的路径",
     )
     parser.add_argument(

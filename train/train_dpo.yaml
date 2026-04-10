@@ -19,7 +19,7 @@
 
 ### 模型配置
 # 使用 SFT 合并后的模型作为起点（merge_lora.py 合并后的完整模型）
-model_name_or_path: outputs/ustc-qa-merged
+model_name_or_path: /root/autodl-tmp/ustc-qa-merged
 trust_remote_code: true
 
 ### 训练方法
