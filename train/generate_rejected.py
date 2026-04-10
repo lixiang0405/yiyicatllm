@@ -141,20 +141,13 @@ def main():
         dtype="bfloat16",
         gpu_memory_utilization=0.85,
     )
-    # 获取 stop token（Qwen 的 <|im_end|> 等）
-    stop_token_ids = []
-    for token_str in ["<|im_end|>", "<|endoftext|>"]:
-        token_id = tokenizer.convert_tokens_to_ids(token_str)
-        if token_id is not None and token_id != tokenizer.unk_token_id:
-            stop_token_ids.append(token_id)
-
     sampling_params = SamplingParams(
         temperature=0.7,            # 适度采样，生成多样但不至于乱码
         top_p=0.85,
         max_tokens=args.max_new_tokens,
         repetition_penalty=1.3,     # 加强重复惩罚，防止重复乱码
         seed=42,                    # 固定种子保证可复现
-        stop_token_ids=stop_token_ids if stop_token_ids else None,
+        stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>", "\nuser", "\nassistant", "\ninstruction"],
     )
     print(f"  vLLM 模型加载完成")
 
