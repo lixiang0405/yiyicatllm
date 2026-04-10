@@ -74,9 +74,11 @@ pip install transformers>=4.46.0 datasets>=3.0.0 accelerate>=1.0.0 \
 
 echo ""
 echo "  安装 veRL + vLLM (GRPO 强化学习)..."
-pip install verl vllm>=0.8.2 \
-    -i https://pypi.tuna.tsinghua.edu.cn/simple 2>&1 | tail -5
+# 先单独装 vLLM（用官方源，AutoDL 有学术网络加速）
+pip install vllm -i https://pypi.org/simple --timeout 300
 
+# 再装 veRL
+pip install verl -i https://pypi.org/simple --timeout 300
 echo ""
 echo "  安装 LLaMA-Factory..."
 if [ ! -d "${PROJECT_DIR}/LLaMA-Factory" ]; then
