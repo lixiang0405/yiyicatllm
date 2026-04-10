@@ -63,10 +63,11 @@ def _score_single(prompt: str, response: str) -> float:
 
 def _length_reward(response: str) -> float:
     """
-    长度奖励: 鼓励 100-500 字的回答
+    长度奖励: 鼓励 100-300 字的回答 (与 SFT 训练数据一致)
     太短 (<50): 信息不足
-    适中 (100-500): 最佳
-    太长 (>800): 可能啰嗦
+    适中 (100-300): 最佳
+    稍长 (300-500): 可接受但不鼓励
+    太长 (>500): 啰嗦
     """
     length = len(response)
 
@@ -76,12 +77,12 @@ def _length_reward(response: str) -> float:
         return 0.0
     elif length < 100:
         return 0.5
-    elif length <= 500:
+    elif length <= 300:
         return 2.0
-    elif length <= 800:
-        return 1.5
-    else:
+    elif length <= 500:
         return 1.0
+    else:
+        return 0.0
 
 
 def _format_reward(response: str) -> float:
@@ -111,36 +112,76 @@ def _format_reward(response: str) -> float:
     return min(score, 2.0)
 
 
+def _extract_entities_from_text(text):
+    """从文本中动态提取关键实体（专有名词、技术术语、机构名等）"""
+    entities = set()
+
+    # 1. 英文专有名词/技术术语（2字符以上的连续英文+数字）
+    english_terms = re.findall(r'[A-Za-z][A-Za-z0-9_.+-]{1,30}', text)
+    stop_words = {
+        "the", "and", "for", "with", "from", "that", "this", "are",
+        "was", "not", "can", "will", "has", "have", "but", "also",
+    }
+    for term in english_terms:
+        if term.lower() not in stop_words:
+            entities.add(term)
+
+    # 2. 中文专有名词：书名号/引号内的内容
+    quoted = re.findall(r'[《「『"](.*?)[》」』"]', text)
+    entities.update(q for q in quoted if 2 <= len(q) <= 20)
+
+    # 3. 中文机构/地点名
+    org_patterns = re.findall(
+        r'[\u4e00-\u9fff]{2,10}(?:大学|学院|医院|公司|实验室|研究院|研究所|中心|平台|基金会)',
+        text,
+    )
+    entities.update(org_patterns)
+
+    # 4. 人名模式：xx教授、xx老师、xx学长等
+    name_patterns = re.findall(
+        r'([\u4e00-\u9fff]{2,4})(?:教授|老师|同学|学长|学姐|院士|博士|导师)',
+        text,
+    )
+    entities.update(name_patterns)
+
+    # 5. 数字+单位的事实
+    num_facts = re.findall(
+        r'\d+(?:年|月|天|人|分|元|%|GB|MB|门|学分|个|条|篇|次|届|期)',
+        text,
+    )
+    entities.update(num_facts)
+
+    return entities
+
+
+# 核心高频关键词（跨主题通用词，作为额外加分项）
+_CORE_KEYWORDS = {
+    "中科大", "中国科学技术大学", "USTC", "科大",
+    "软件学院", "软院", "科软",
+    "苏高院", "苏州高等研究院", "苏州校区",
+    "合肥", "合肥校区",
+    "导师", "论文", "毕业", "实习", "就业",
+    "选课", "学分", "宿舍", "校区",
+}
+
+
 def _keyword_reward(prompt: str, response: str) -> float:
     """
-    关键词奖励: 回答中包含与问题相关的领域关键词
+    关键词奖励: 动态从问题中提取关键实体 + 核心词表
+    参考 evaluate_model.py 的 _extract_entities_from_text 逻辑
     """
-    # 中科大软件学院相关关键词
-    ustc_keywords = [
-        '中科大', '中国科学技术大学', 'USTC', '科大',
-        '软件学院', '软院', '科软',
-        '苏高院', '苏州高等研究院', '苏州校区',
-        '合肥', '合肥校区',
-    ]
-
-    # 学术/校园生活关键词
-    academic_keywords = [
-        '导师', '论文', '毕业', '实习', '就业',
-        '选课', '学分', '研一', '研二', '研三',
-        '宿舍', '食堂', '校区', '实验室',
-        '考研', '跨考', '保研', '选调',
-    ]
-
     score = 0.0
-    response_lower = response.lower()
 
-    # 中科大关键词匹配
-    ustc_matches = sum(1 for kw in ustc_keywords if kw.lower() in response_lower)
-    score += min(ustc_matches * 0.3, 1.0)
+    # 1. 动态提取：从 prompt 中提取关键实体，检查 response 是否覆盖
+    prompt_entities = _extract_entities_from_text(prompt)
+    if prompt_entities:
+        hit_count = sum(1 for entity in prompt_entities if entity in response)
+        hit_rate = hit_count / len(prompt_entities)
+        score += hit_rate * 1.0  # 最高 1.0
 
-    # 学术关键词匹配
-    academic_matches = sum(1 for kw in academic_keywords if kw in response)
-    score += min(academic_matches * 0.2, 1.0)
+    # 2. 核心词表：response 中出现的核心关键词
+    core_hits = sum(1 for kw in _CORE_KEYWORDS if kw in response)
+    score += min(core_hits * 0.2, 1.0)  # 最高 1.0
 
     return min(score, 2.0)
 
@@ -154,11 +195,11 @@ def _fluency_penalty(response: str) -> float:
     """
     penalty = 0.0
 
-    # 检查重复: 连续重复的短语
-    for n in [3, 5, 10]:
-        words = response
-        for i in range(len(words) - 2 * n):
-            if words[i:i+n] == words[i+n:i+2*n] and len(words[i:i+n].strip()) > 0:
+    # 检查重复: 连续重复的短语 (n>=6 避免误伤正常表述如"一一对应")
+    for n in [6, 10, 20]:
+        for i in range(len(response) - 2 * n):
+            segment = response[i:i+n]
+            if segment == response[i+n:i+2*n] and len(segment.strip()) > 0:
                 penalty -= 0.5
                 break
 
@@ -222,16 +263,16 @@ if __name__ == '__main__':
     # 测试奖励函数
     test_cases = [
         {
-            'prompt': '中科大少年班是什么？',
-            'response': '中科大少年班创办于1978年，是中国高等教育改革的一面旗帜。少年班面向16周岁以下的优秀高中生和少年，通过严格的选拔考试录取。少年班的特色包括：1）因材施教，为每位学生制定个性化培养方案；2）本科阶段即可接触前沿科研；3）实行导师制，由院士和知名教授担任导师。少年班已培养出大量杰出人才。'
+            'prompt': '中科大软件学院研一选课有什么建议？',
+            'response': '中科大软件学院研一选课建议如下：1）上学期优先修必修课和感兴趣的限选课，最多选18学分；2）下学期补足剩余学分，研一总共需要修满34学分；3）选课前多参考学长学姐的评价，了解课程难度和老师风格；4）注意部分课程有先修要求，提前规划好顺序。建议研一上学期不要选太多课，留出时间适应研究生生活和了解导师的研究方向。'
         },
         {
-            'prompt': '中科大少年班是什么？',
-            'response': '就是让小孩上大学的地方。'
+            'prompt': '苏高院宿舍条件怎么样？',
+            'response': '还行吧，就那样。'
         },
         {
-            'prompt': '中科大的优势学科？',
-            'response': '不知道不知道不知道不知道不知道'
+            'prompt': '科软就业怎么样？',
+            'response': '就业就业就业就业就业就业就业就业就业就业'
         },
     ]
 
