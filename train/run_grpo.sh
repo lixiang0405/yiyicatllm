@@ -106,13 +106,14 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=0.7 \
     actor_rollout_ref.rollout.top_p=0.9 \
     actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=8 \
     actor_rollout_ref.ref.fsdp_config.param_offload=false \
     reward_model.enable=false \
     custom_reward_function.path=train/reward_function.py \
     custom_reward_function.name=compute_reward \
     algorithm.adv_estimator=grpo \
-    trainer.total_epochs=3 \
+    trainer.total_epochs=1 \
     trainer.save_freq=50 \
     trainer.test_freq=25 \
     trainer.project_name=ustc-qa-grpo \
