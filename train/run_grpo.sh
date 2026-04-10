@@ -76,6 +76,10 @@ echo "  Actor 模型: ${DPO_MODEL_PATH}"
 echo "  奖励函数: 规则奖励 (reward_function.py)"
 echo "  每个 prompt 采样: 4 个回答"
 
+# 清理上一次的 Ray 进程，避免缓存导致配置不生效
+ray stop --force 2>/dev/null || true
+sleep 2
+
 # veRL 使用 Hydra 配置系统，基于内置 ppo_trainer.yaml 默认配置，通过命令行覆盖参数
 python3 -m verl.trainer.main_ppo \
     --config-name="ppo_trainer" \
