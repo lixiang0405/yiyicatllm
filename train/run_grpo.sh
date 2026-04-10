@@ -95,7 +95,7 @@ python3 -m verl.trainer.main_ppo \
     data.trust_remote_code=true \
     actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
     actor_rollout_ref.model.trust_remote_code=true \
-    actor_rollout_ref.model.override_config=null \
+    actor_rollout_ref.model.override_config.attn_implementation=sdpa \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.actor.ppo_epochs=1 \
