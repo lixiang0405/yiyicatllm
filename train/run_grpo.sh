@@ -76,16 +76,50 @@ echo "  Actor 模型: ${DPO_MODEL_PATH}"
 echo "  奖励函数: 规则奖励 (reward_function.py)"
 echo "  每个 prompt 采样: 4 个回答"
 
-# veRL 使用 Hydra 配置系统，需要用 --config-path + --config-name
+# veRL 使用 Hydra 配置系统，基于内置 ppo_trainer.yaml 默认配置，通过命令行覆盖参数
 python3 -m verl.trainer.main_ppo \
-    --config-path="${PROJECT_DIR}/train" \
-    --config-name="verl_config" \
+    --config-name="ppo_trainer" \
     data.train_files="${GRPO_DATA}" \
+    data.val_files=null \
+    data.prompt_key=prompt \
+    data.max_prompt_length=512 \
+    data.max_response_length=512 \
+    data.train_batch_size=64 \
+    data.trust_remote_code=true \
     actor_rollout_ref.model.path="${DPO_MODEL_PATH}" \
+    actor_rollout_ref.model.trust_remote_code=true \
+    actor_rollout_ref.actor.ppo_mini_batch_size=32 \
+    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.actor.ppo_epochs=1 \
+    actor_rollout_ref.actor.use_kl_loss=true \
+    actor_rollout_ref.actor.kl_loss_coef=0.002 \
+    actor_rollout_ref.actor.kl_loss_type=low_var_kl \
+    actor_rollout_ref.actor.use_torch_compile=false \
+    actor_rollout_ref.actor.optim.lr=5e-7 \
+    actor_rollout_ref.actor.optim.lr_warmup_steps=20 \
+    actor_rollout_ref.actor.optim.lr_scheduler_type=constant \
+    actor_rollout_ref.actor.fsdp_config.param_offload=false \
+    actor_rollout_ref.actor.fsdp_config.optimizer_offload=false \
+    actor_rollout_ref.rollout.name=vllm \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+    actor_rollout_ref.rollout.temperature=0.7 \
+    actor_rollout_ref.rollout.top_p=0.9 \
+    actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=8 \
+    actor_rollout_ref.ref.fsdp_config.param_offload=false \
+    reward_model.enable=false \
+    custom_reward_function.path=train/reward_function.py \
+    custom_reward_function.name=compute_reward \
+    algorithm.adv_estimator=grpo \
+    trainer.total_epochs=3 \
+    trainer.save_freq=50 \
+    trainer.test_freq=25 \
+    trainer.project_name=ustc-qa-grpo \
     trainer.n_gpus_per_node="${NUM_GPUS}" \
     trainer.experiment_name="grpo-$(date +%Y%m%d-%H%M%S)" \
-    trainer.default_local_dir="${PROJECT_DIR}/outputs/ustc-qa-grpo"
+    trainer.default_local_dir="${PROJECT_DIR}/outputs/ustc-qa-grpo" \
+    'trainer.logger=["console"]'
 
 echo ""
 echo "=========================================="
