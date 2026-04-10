@@ -85,6 +85,13 @@ actor_rollout_ref:
 # ============================================
 reward_model:
   enable: false
+  strategy: fsdp
+  num_workers: null
+  model:
+    input_tokenizer: null
+    path: null
+  reward_manager: null
+  reward_kwargs: {}
 
 custom_reward:
   enable: true
