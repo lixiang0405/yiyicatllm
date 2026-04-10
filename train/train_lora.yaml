@@ -31,7 +31,7 @@ cutoff_len: 2048
 per_device_train_batch_size: 4
 gradient_accumulation_steps: 4
 learning_rate: 1.5e-4
-num_train_epochs: 8
+num_train_epochs: 6
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
 max_grad_norm: 1.0
