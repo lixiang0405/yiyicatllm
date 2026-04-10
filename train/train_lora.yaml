@@ -27,6 +27,12 @@ dataset_dir: LLaMA-Factory/data
 template: qwen
 cutoff_len: 2048
 
+### 验证集配置（用偏好数据作为验证集，监控 eval loss 判断过拟合）
+eval_dataset: ustc_qa_eval
+eval_steps: 20
+per_device_eval_batch_size: 4
+eval_strategy: steps
+
 ### 训练超参数
 per_device_train_batch_size: 4
 gradient_accumulation_steps: 4
@@ -47,6 +53,8 @@ output_dir: outputs/ustc-qa-lora
 logging_steps: 5
 save_steps: 100
 save_total_limit: 3
+load_best_model_at_end: true         # 训练结束时自动加载 eval loss 最低的 checkpoint
+metric_for_best_model: eval_loss     # 以 eval loss 作为最优模型的判断标准
 
 ### 其他
 overwrite_output_dir: true

@@ -14,16 +14,18 @@ set -e
 
 TRAIN_CONFIG="train/train_dpo.yaml"
 LLAMA_FACTORY_DIR="LLaMA-Factory"
-PREF_DATA_FILE="$(pwd)/data/preference_data.json"
+DPO_TRAIN_DATA_FILE="$(pwd)/data/dpo_train_data.json"
+DPO_EVAL_DATA_FILE="$(pwd)/data/eval_data.json"
 
 echo "=========================================="
 echo "  中科大智能问答助手 - DPO 偏好对齐训练"
 echo "=========================================="
 
-# --- 检查 SFT 模型是否存在 ---
-if [ ! -d "outputs/ustc-qa-lora" ]; then
-    echo "[ERROR] SFT 模型不存在，请先运行 bash train/run_train.sh"
-    echo "  DPO 需要在 SFT 微调后的模型基础上进行"
+# --- 检查 SFT 合并模型是否存在 ---
+if [ ! -d "outputs/ustc-qa-merged" ]; then
+    echo "[ERROR] SFT 合并模型不存在，请先运行:"
+    echo "  1. bash train/run_train.sh        (SFT 微调)"
+    echo "  2. python train/merge_lora.py     (合并 LoRA 权重)"
     exit 1
 fi
 
@@ -42,7 +44,17 @@ import json
 with open('${DATASET_INFO}', 'r') as f:
     info = json.load(f)
 info['ustc_qa_preference'] = {
-    'file_name': '${PREF_DATA_FILE}',
+    'file_name': '${DPO_TRAIN_DATA_FILE}',
+    'ranking': True,
+    'columns': {
+        'prompt': 'instruction',
+        'query': 'input',
+        'chosen': 'chosen',
+        'rejected': 'rejected'
+    }
+}
+info['ustc_qa_preference_eval'] = {
+    'file_name': '${DPO_EVAL_DATA_FILE}',
     'ranking': True,
     'columns': {
         'prompt': 'instruction',
@@ -58,13 +70,21 @@ print('  偏好数据集注册成功: ustc_qa_preference')
 
 # --- 检查偏好数据 ---
 echo "[2/3] 检查偏好数据..."
-if [ ! -f "${PREF_DATA_FILE}" ]; then
-    echo "[ERROR] 偏好数据不存在: ${PREF_DATA_FILE}"
+if [ ! -f "${DPO_TRAIN_DATA_FILE}" ]; then
+    echo "[ERROR] DPO训练数据不存在: ${DPO_TRAIN_DATA_FILE}"
+    echo "  请先运行 bash train/run_train.sh 完成SFT训练（会自动分割偏好数据）"
+    exit 1
+fi
+if [ ! -f "${DPO_EVAL_DATA_FILE}" ]; then
+    echo "[ERROR] DPO验证数据不存在: ${DPO_EVAL_DATA_FILE}"
+    echo "  请先运行 bash train/run_train.sh 完成SFT训练（会自动分割偏好数据）"
     exit 1
 fi
 
-DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('${PREF_DATA_FILE}'))))")
-echo "  偏好数据: ${DATA_COUNT} 条"
+TRAIN_COUNT=$(python3 -c "import json; print(len(json.load(open('${DPO_TRAIN_DATA_FILE}'))))")
+EVAL_COUNT=$(python3 -c "import json; print(len(json.load(open('${DPO_EVAL_DATA_FILE}'))))")
+echo "  DPO训练数据: ${TRAIN_COUNT} 条"
+echo "  DPO验证数据: ${EVAL_COUNT} 条"
 
 # --- 开始 DPO 训练 ---
 echo "[3/3] 开始 DPO 训练..."
@@ -86,9 +106,9 @@ echo "=========================================="
 echo "  DPO 训练完成!"
 echo "  DPO LoRA 权重保存至: outputs/ustc-qa-dpo"
 echo ""
-echo "  下一步: 合并 LoRA 权重"
+echo "  下一步: 合并 DPO LoRA 权重"
 echo "  python train/merge_lora.py \\"
-echo "      --base-model Qwen/Qwen2.5-7B \\"
+echo "      --base-model outputs/ustc-qa-merged \\"
 echo "      --lora-adapter outputs/ustc-qa-dpo \\"
-echo "      --output outputs/ustc-qa-merged"
+echo "      --output outputs/ustc-qa-dpo-merged"
 echo "=========================================="

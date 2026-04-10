@@ -11,6 +11,9 @@ set -e
 TRAIN_CONFIG="train/train_lora.yaml"
 LLAMA_FACTORY_DIR="LLaMA-Factory"
 DATA_FILE="$(pwd)/data/new_qa.json"
+PREF_DATA_FILE="$(pwd)/data/preference_data.json"
+EVAL_DATA_FILE="$(pwd)/data/eval_data.json"
+DPO_TRAIN_DATA_FILE="$(pwd)/data/dpo_train_data.json"
 OUTPUT_DIR="outputs/ustc-qa-lora"
 GPU_STATS_FILE="${OUTPUT_DIR}/gpu_stats.json"
 TRAIN_REPORT_FILE="${OUTPUT_DIR}/train_report.json"
@@ -25,8 +28,42 @@ if [ ! -d "${LLAMA_FACTORY_DIR}" ]; then
     exit 1
 fi
 
+# --- Step 0.5: 分割偏好数据 (验证集 + DPO训练集) ---
+echo "[0/6] 分割偏好数据..."
+if [ -f "${PREF_DATA_FILE}" ]; then
+    python3 -c "
+import json, random
+
+with open('${PREF_DATA_FILE}', 'r') as f:
+    pref_data = json.load(f)
+
+total = len(pref_data)
+eval_size = min(200, total // 5)  # 最多200条，或总量的20%
+
+random.seed(42)
+random.shuffle(pref_data)
+
+eval_data = pref_data[:eval_size]
+train_data = pref_data[eval_size:]
+
+# 保存验证集（完整偏好格式，SFT阶段用chosen作response，DPO阶段用完整偏好对）
+with open('${EVAL_DATA_FILE}', 'w') as f:
+    json.dump(eval_data, f, indent=2, ensure_ascii=False)
+
+# 保存DPO训练集
+with open('${DPO_TRAIN_DATA_FILE}', 'w') as f:
+    json.dump(train_data, f, indent=2, ensure_ascii=False)
+
+print(f'  偏好数据总量: {total} 条')
+print(f'  验证集: {eval_size} 条 -> ${EVAL_DATA_FILE}')
+print(f'  DPO训练集: {len(train_data)} 条 -> ${DPO_TRAIN_DATA_FILE}')
+"
+else
+    echo "  [WARN] 偏好数据不存在: ${PREF_DATA_FILE}，跳过分割"
+fi
+
 # --- Step 1: 注册数据集到 LLaMA-Factory ---
-echo "[1/5] 注册数据集..."
+echo "[1/6] 注册数据集..."
 DATASET_INFO="$(pwd)/${LLAMA_FACTORY_DIR}/data/dataset_info.json"
 DATASET_DIR_ABS="$(pwd)/${LLAMA_FACTORY_DIR}/data"
 
@@ -42,6 +79,14 @@ info['ustc_qa'] = {
         'response': 'output'
     }
 }
+info['ustc_qa_eval'] = {
+    'file_name': '${EVAL_DATA_FILE}',
+    'columns': {
+        'prompt': 'instruction',
+        'query': 'input',
+        'response': 'chosen'
+    }
+}
 with open('${DATASET_INFO}', 'w') as f:
     json.dump(info, f, indent=2, ensure_ascii=False)
 print('  数据集注册成功: ustc_qa -> ${DATA_FILE}')
@@ -52,7 +97,7 @@ sed -i "s|^dataset_dir:.*|dataset_dir: ${DATASET_DIR_ABS}|" ${TRAIN_CONFIG}
 echo "  dataset_dir 已更新: ${DATASET_DIR_ABS}"
 
 # --- Step 2: 检查训练数据 ---
-echo "[2/5] 检查训练数据..."
+echo "[2/6] 检查训练数据..."
 if [ ! -f "${DATA_FILE}" ]; then
     echo "  [WARN] new_qa.json 不存在，使用 sample_data.json"
     cp data/sample_data.json data/new_qa.json
@@ -63,7 +108,7 @@ DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('${DATA_FILE}')))
 echo "  训练数据: ${DATA_COUNT} 条"
 
 # --- Step 3: 采集环境信息 ---
-echo "[3/5] 采集环境信息..."
+echo "[3/6] 采集环境信息..."
 mkdir -p "${OUTPUT_DIR}"
 
 NUM_GPUS=$(python3 -c "import torch; print(torch.cuda.device_count())")
@@ -99,7 +144,7 @@ for gpu in env_info['gpus']:
 "
 
 # --- Step 4: 启动 GPU 监控 (后台) ---
-echo "[4/5] 启动 GPU 监控..."
+echo "[4/6] 启动 GPU 监控..."
 python3 train/gpu_monitor.py --output "${GPU_STATS_FILE}" --interval 5 &
 GPU_MONITOR_PID=$!
 echo "  GPU 监控已启动 (PID=${GPU_MONITOR_PID})"
@@ -116,7 +161,7 @@ cleanup() {
 trap cleanup EXIT
 
 # --- Step 5: 开始训练 ---
-echo "[5/5] 开始训练..."
+echo "[5/6] 开始训练..."
 
 TRAIN_START_TIME=$(date +%s)
 TRAIN_START_TIME_STR=$(date '+%Y-%m-%d %H:%M:%S')

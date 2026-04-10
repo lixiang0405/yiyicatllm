@@ -444,6 +444,15 @@ ZeRO（Zero Redundancy Optimizer）通过分片优化器状态和梯度来降低
 - [PEFT](https://github.com/huggingface/peft) - 参数高效微调库
 - [Qwen2.5](https://github.com/QwenLM/Qwen2.5) - 基座模型
 
+# 对比 SFT 模型
+python3 train/evaluate_model.py --base-model /root/autodl-tmp/Qwen2.5-7B --lora-adapter outputs/ustc-qa-lora
+
+# 对比 DPO 模型  
+python3 train/evaluate_model.py --base-model outputs/ustc-qa-merged --lora-adapter outputs/ustc-qa-dpo
+
+# 对比 GRPO 模型
+python3 train/evaluate_model.py --base-model outputs/ustc-qa-grpo
+
 ## License
 
 MIT License

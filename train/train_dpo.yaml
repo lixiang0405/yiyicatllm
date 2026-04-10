@@ -18,9 +18,8 @@
 #   2. 再用 DPO 在 SFT 模型基础上做偏好对齐 (本配置)
 
 ### 模型配置
-# 使用 SFT 微调后的模型作为起点
-model_name_or_path: Qwen/Qwen2.5-7B
-adapter_name_or_path: outputs/ustc-qa-lora
+# 使用 SFT 合并后的模型作为起点（merge_lora.py 合并后的完整模型）
+model_name_or_path: outputs/ustc-qa-merged
 trust_remote_code: true
 
 ### 训练方法
@@ -46,14 +45,21 @@ lora_target: all
 #   "columns": {"prompt": "instruction", "query": "input", "chosen": "chosen", "rejected": "rejected"}
 # }
 dataset: ustc_qa_preference
+dataset_dir: LLaMA-Factory/data
 template: qwen
 cutoff_len: 2048
 
+### 验证集配置（监控 DPO eval loss 判断过拟合）
+eval_dataset: ustc_qa_preference_eval
+eval_steps: 10
+per_device_eval_batch_size: 2
+eval_strategy: steps
+
 ### 训练超参数
-per_device_train_batch_size: 1       # DPO 需要同时加载 chosen+rejected，显存翻倍，用1更安全
-gradient_accumulation_steps: 8       # 有效batch_size = 1 × 8 × 2卡 = 16
+per_device_train_batch_size: 4       # LoRA 微调显存占用小，5090 32GB 可以支撑 batch=4
+gradient_accumulation_steps: 4       # 有效batch_size = 4 × 4 × 2卡 = 32
 learning_rate: 5.0e-5
-num_train_epochs: 2
+num_train_epochs: 5                  # 配合 load_best_model_at_end，多训几轮让模型充分学习
 lr_scheduler_type: cosine
 warmup_ratio: 0.1
 max_grad_norm: 1.0
@@ -61,14 +67,16 @@ max_grad_norm: 1.0
 ### 混合精度
 bf16: true
 
-### DeepSpeed (可选，小数据集单卡即可)
-# deepspeed: train/ds_config_zero2.json
+### DeepSpeed
+deepspeed: train/ds_config_zero2.json
 
 ### 输出配置
 output_dir: outputs/ustc-qa-dpo
 logging_steps: 5
 save_steps: 50
 save_total_limit: 3
+load_best_model_at_end: true         # 训练结束时自动加载 eval loss 最低的 checkpoint
+metric_for_best_model: eval_loss     # 以 eval loss 作为最优模型的判断标准
 
 ### 其他
 overwrite_output_dir: true
