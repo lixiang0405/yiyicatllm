@@ -355,8 +355,17 @@ def evaluate_model(
 
 
 def free_vllm(llm):
-    """释放 vLLM 模型显存"""
+    """释放 vLLM 模型显存，等待 GPU 进程完全退出"""
+    from vllm.distributed.parallel_state import destroy_model_parallel
+    try:
+        destroy_model_parallel()
+    except Exception:
+        pass
     del llm
+    gc.collect()
+    torch.cuda.empty_cache()
+    # 等待 vLLM worker 进程完全退出
+    time.sleep(5)
     gc.collect()
     torch.cuda.empty_cache()
 
