@@ -547,6 +547,8 @@ def main():
                         help="合并模型保存路径 (建议放数据盘)")
     parser.add_argument("--skip-generate", action="store_true",
                         help="跳过推理，复用上次缓存的生成数据")
+    parser.add_argument("--epoch-offset", type=int, default=0,
+                        help="epoch 编号偏移量，用于续训时保持编号连续（如之前跑了3轮，设为3则从epoch-4开始）")
     args = parser.parse_args()
 
     print("=" * 60)
@@ -592,14 +594,15 @@ def main():
     best_step = -1
 
     for epoch in range(args.epochs):
+        epoch_num = epoch + 1 + args.epoch_offset
         log(f"\n{'='*60}")
-        log(f"  Epoch {epoch + 1}/{args.epochs}")
+        log(f"  Epoch {epoch_num}/{args.epochs + args.epoch_offset}")
         log(f"{'='*60}")
 
         # ========================================
         # Phase 1: vLLM 一次性批量生成所有回答（支持缓存）
         # ========================================
-        cache_file = output_dir / f"generate_cache_epoch{epoch+1}.json"
+        cache_file = output_dir / f"generate_cache_epoch{epoch_num}.json"
 
         if args.skip_generate and cache_file.exists():
             log(f"\n[Phase 1] 跳过推理，加载缓存: {cache_file}")
@@ -798,7 +801,7 @@ def main():
 
             # 定期保存 checkpoint（仅在 save_steps > 0 时）
             if args.save_steps > 0 and (step + 1) % args.save_steps == 0:
-                ckpt_path = output_dir / f"checkpoint-epoch{epoch+1}-step{step+1}"
+                ckpt_path = output_dir / f"checkpoint-epoch{epoch_num}-step{step+1}"
                 policy_model.save_pretrained(str(ckpt_path))
                 tokenizer.save_pretrained(str(ckpt_path))
                 log(f"  Checkpoint 保存: {ckpt_path}")
@@ -808,7 +811,7 @@ def main():
             for key in epoch_metrics:
                 epoch_metrics[key] /= step_count
         avg_reward = sum(all_flat_rewards_list) / len(all_flat_rewards_list)
-        log(f"\n  Epoch {epoch+1} 平均指标:")
+        log(f"\n  Epoch {epoch_num} 平均指标:")
         log(f"    loss={epoch_metrics['loss']:.4f}")
         log(f"    policy_loss={epoch_metrics['policy_loss']:.4f}")
         log(f"    kl_divergence={epoch_metrics['kl_divergence']:.4f}")
@@ -819,7 +822,7 @@ def main():
         # ========================================
         log("\n[Phase 4] 合并 LoRA 权重...")
         merged_output = Path(args.merged_output)
-        epoch_merged_path = str(merged_output / f"epoch-{epoch+1}")
+        epoch_merged_path = str(merged_output / f"epoch-{epoch_num}")
 
         # 合并完整模型到数据盘
         merge_and_save_lora(policy_model, tokenizer, epoch_merged_path)
@@ -949,8 +952,7 @@ def main():
     print("  GRPO 训练完成!")
     print(f"  最终合并模型 (数据盘): {final_model_path}")
     if best_step > 0:
-        print(f"  最优 LoRA (系统盘): {output_dir / f'best-epoch{args.epochs}'} "
-              f"(step={best_step}, reward={best_reward:.3f})")
+        print(f"  全局最优: step={best_step}, reward={best_reward:.3f}")
     print(f"  训练报告: {report_path}")
     print(f"  训练日志: {output_dir / 'train.log'}")
     print("=" * 60)
