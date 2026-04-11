@@ -348,8 +348,9 @@ def compute_log_probs_batched(
 
     pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
     all_log_probs = []
+    total_batches = math.ceil(len(prompts) / micro_batch_size)
 
-    for mb_start in range(0, len(prompts), micro_batch_size):
+    for batch_idx, mb_start in enumerate(range(0, len(prompts), micro_batch_size)):
         mb_end = min(mb_start + micro_batch_size, len(prompts))
         mb_ids = all_full_ids[mb_start:mb_end]
         mb_starts = all_response_starts[mb_start:mb_end]
@@ -370,6 +371,11 @@ def compute_log_probs_batched(
 
         # 及时释放中间张量
         del logits, input_ids, attention_mask
+
+        # 每 50 个 batch 打印一次进度
+        if (batch_idx + 1) % 50 == 0 or (batch_idx + 1) == total_batches:
+            print(f"    log_prob 进度: {batch_idx+1}/{total_batches} "
+                  f"({mb_end}/{len(prompts)} 条)", flush=True)
 
     return torch.cat(all_log_probs)
 
@@ -649,7 +655,7 @@ def main():
 
         ref_log_probs = compute_log_probs_batched(
             ref_model, tokenizer, all_flat_prompts, all_flat_responses,
-            device, args.max_length, micro_batch_size=16, requires_grad=False,
+            device, args.max_length, micro_batch_size=64, requires_grad=False,
         )
         log(f"  ref log_prob 计算完成: shape={ref_log_probs.shape}")
 
