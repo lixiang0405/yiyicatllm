@@ -603,9 +603,22 @@ def main():
         log(f"{'='*60}")
 
         # ========================================
-        # Phase 1: vLLM 一次性批量生成所有回答（支持缓存）
+        # Phase 1: vLLM 批量生成回答（只采样训练需要的数量）
         # ========================================
         cache_file = output_dir / f"generate_cache_epoch{epoch_num}.json"
+
+        # 计算本轮实际需要的 prompt 数量
+        max_steps_this_epoch = args.max_steps if args.max_steps > 0 else len(all_prompts) // args.batch_size
+        needed_prompts = min(max_steps_this_epoch * args.batch_size, len(all_prompts))
+
+        # 每轮随机打乱，采样需要的数量
+        import random
+        random.seed(42 + epoch)
+        epoch_indices = list(range(len(all_prompts)))
+        random.shuffle(epoch_indices)
+        epoch_indices = epoch_indices[:needed_prompts]
+        epoch_prompts = [all_prompts[i] for i in epoch_indices]
+        log(f"\n  本轮采样 {needed_prompts}/{len(all_prompts)} 条 prompt 进行训练")
 
         if args.skip_generate and cache_file.exists():
             log(f"\n[Phase 1] 跳过推理，加载缓存: {cache_file}")
@@ -616,12 +629,12 @@ def main():
             log(f"  加载完成: {len(all_responses)} 条 prompt 的生成结果")
         else:
             log("\n[Phase 1] vLLM 批量生成回答...")
-            log(f"  共 {len(all_prompts)} 条 prompt × {args.num_samples} 采样")
+            log(f"  共 {len(epoch_prompts)} 条 prompt × {args.num_samples} 采样")
 
             all_responses, all_token_ids = generate_responses_vllm(
                 model_path=current_model_path,
                 tokenizer=tokenizer,
-                prompts=all_prompts,
+                prompts=epoch_prompts,
                 num_samples=args.num_samples,
                 max_new_tokens=args.max_new_tokens,
                 temperature=args.temperature,
@@ -635,7 +648,7 @@ def main():
         # 计算所有 reward
         log("\n[Phase 1.5] 计算奖励...")
         all_rewards = []
-        for prompt_text, responses in zip(all_prompts, all_responses):
+        for prompt_text, responses in zip(epoch_prompts, all_responses):
             prompt_list = [prompt_text] * len(responses)
             rewards = compute_reward(prompt_list, responses)
             all_rewards.append(rewards)
@@ -654,7 +667,7 @@ def main():
         all_advantages = []
         all_flat_rewards_list = []
 
-        for prompt_text, responses, rewards in zip(all_prompts, all_responses, all_rewards):
+        for prompt_text, responses, rewards in zip(epoch_prompts, all_responses, all_rewards):
             reward_tensor = torch.tensor(rewards, dtype=torch.float32)
             mean_reward = reward_tensor.mean()
             std_reward = reward_tensor.std()
