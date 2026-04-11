@@ -82,15 +82,16 @@ python3 "${PROJECT_DIR}/train/train_grpo.py" \
     --num-samples 4 \
     --batch-size 16 \
     --epochs 1 \
-    --lr 5e-5 \
+    --lr 5e-6 \
     --lora-rank 32 \
     --lora-alpha 64 \
     --clip-epsilon 0.2 \
-    --kl-coef 0.002 \
+    --kl-coef 0.05 \
     --max-length 512 \
     --max-new-tokens 256 \
     --temperature 0.7 \
-    --save-steps 50
+    --save-steps 50 \
+    --skip-generate
 
 echo ""
 echo "=========================================="

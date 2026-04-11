@@ -434,8 +434,9 @@ def grpo_train_step(
             requires_grad=True,
         )
 
-        # PPO-clip 目标
+        # PPO-clip 目标（clamp log_ratio 防止 exp 爆炸）
         log_ratio = current_lp - mb_ref_lp.detach()
+        log_ratio = torch.clamp(log_ratio, -5.0, 5.0)  # 防止 ratio 爆炸
         ratio = torch.exp(log_ratio)
         surr1 = ratio * mb_advantages
         surr2 = torch.clamp(ratio, 1.0 - clip_epsilon, 1.0 + clip_epsilon) * mb_advantages
@@ -516,6 +517,8 @@ def main():
                         help="采样温度")
     parser.add_argument("--save-steps", type=int, default=50,
                         help="每多少步保存一次 checkpoint")
+    parser.add_argument("--skip-generate", action="store_true",
+                        help="跳过推理，复用上次缓存的生成数据")
     args = parser.parse_args()
 
     print("=" * 60)
@@ -559,19 +562,34 @@ def main():
         log(f"{'='*60}")
 
         # ========================================
-        # Phase 1: vLLM 一次性批量生成所有回答
+        # Phase 1: vLLM 一次性批量生成所有回答（支持缓存）
         # ========================================
-        log("\n[Phase 1] vLLM 批量生成回答...")
-        log(f"  共 {len(all_prompts)} 条 prompt × {args.num_samples} 采样")
+        cache_file = output_dir / f"generate_cache_epoch{epoch+1}.json"
 
-        all_responses, all_token_ids = generate_responses_vllm(
-            model_path=current_model_path,
-            tokenizer=tokenizer,
-            prompts=all_prompts,
-            num_samples=args.num_samples,
-            max_new_tokens=args.max_new_tokens,
-            temperature=args.temperature,
-        )
+        if args.skip_generate and cache_file.exists():
+            log(f"\n[Phase 1] 跳过推理，加载缓存: {cache_file}")
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cache_data = json.load(f)
+            all_responses = cache_data["responses"]
+            all_token_ids = cache_data.get("token_ids", [[] for _ in all_responses])
+            log(f"  加载完成: {len(all_responses)} 条 prompt 的生成结果")
+        else:
+            log("\n[Phase 1] vLLM 批量生成回答...")
+            log(f"  共 {len(all_prompts)} 条 prompt × {args.num_samples} 采样")
+
+            all_responses, all_token_ids = generate_responses_vllm(
+                model_path=current_model_path,
+                tokenizer=tokenizer,
+                prompts=all_prompts,
+                num_samples=args.num_samples,
+                max_new_tokens=args.max_new_tokens,
+                temperature=args.temperature,
+            )
+
+            # 缓存生成结果
+            log(f"  缓存生成结果到: {cache_file}")
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump({"responses": all_responses}, f, ensure_ascii=False)
 
         # 计算所有 reward
         log("\n[Phase 1.5] 计算奖励...")
