@@ -372,8 +372,8 @@ def compute_log_probs_batched(
         # 及时释放中间张量
         del logits, input_ids, attention_mask
 
-        # 每 50 个 batch 打印一次进度
-        if (batch_idx + 1) % 50 == 0 or (batch_idx + 1) == total_batches:
+        # 仅在大批量（ref log_prob 阶段）时打印进度，训练阶段不刷屏
+        if total_batches > 10 and ((batch_idx + 1) % 50 == 0 or (batch_idx + 1) == total_batches):
             print(f"    log_prob 进度: {batch_idx+1}/{total_batches} "
                   f"({mb_end}/{len(prompts)} 条)", flush=True)
 
