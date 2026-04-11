@@ -683,20 +683,15 @@ def main():
             current_model_path,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
             local_files_only=True,
-        )
+        ).to(tensor_device)
         ref_model.eval()
-        # device_map="auto" 时模型分布在多卡上，用第一个参数的 device 作为输出 device
-        ref_device = next(ref_model.parameters()).device
-        log(f"  参考模型加载完成 (device_map=auto): {get_gpu_memory_info()}")
+        log(f"  参考模型加载完成 (单卡 {tensor_device}): {get_gpu_memory_info()}")
 
         ref_log_probs = compute_log_probs_batched(
             ref_model, tokenizer, all_flat_prompts, all_flat_responses,
-            ref_device, args.max_length, micro_batch_size=128, requires_grad=False,
+            tensor_device, args.max_length, micro_batch_size=96, requires_grad=False,
         )
-        # 确保 ref_log_probs 在 tensor_device 上，与 advantages_tensor 一致
-        ref_log_probs = ref_log_probs.to(tensor_device)
         log(f"  ref log_prob 计算完成: shape={ref_log_probs.shape}")
 
         # 释放 ref_model，腾出显存给 policy_model
