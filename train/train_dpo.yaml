@@ -56,8 +56,8 @@ per_device_eval_batch_size: 2
 eval_strategy: steps
 
 ### 训练超参数
-per_device_train_batch_size: 8       # DPO 需要同时加载 chosen+rejected，显存占用翻倍
-gradient_accumulation_steps: 1       # 有效batch_size = 8 × 1 × 2卡 = 16
+per_device_train_batch_size: 4       # DPO 需要同时加载 chosen+rejected + ref model，显存占用大
+gradient_accumulation_steps: 2       # 有效batch_size = 4 × 2 × 2卡 = 16
 learning_rate: 1.0e-5                # DPO lr 适当调大，加速收敛
 num_train_epochs: 1                  # 1 轮即可，避免过拟合（rejected 质量提高后偏好信号更密集）
 lr_scheduler_type: cosine
