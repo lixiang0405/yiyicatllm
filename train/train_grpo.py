@@ -690,7 +690,7 @@ def main():
 
         ref_log_probs = compute_log_probs_batched(
             ref_model, tokenizer, all_flat_prompts, all_flat_responses,
-            tensor_device, args.max_length, micro_batch_size=96, requires_grad=False,
+            tensor_device, args.max_length, micro_batch_size=64, requires_grad=False,
         )
         log(f"  ref log_prob 计算完成: shape={ref_log_probs.shape}")
 
