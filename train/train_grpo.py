@@ -55,10 +55,22 @@ from reward_function import compute_reward
 # 工具函数
 # ============================================
 
+_log_file = None
+
+def init_log_file(output_dir: str):
+    """初始化日志文件"""
+    global _log_file
+    os.makedirs(output_dir, exist_ok=True)
+    _log_file = open(os.path.join(output_dir, "train.log"), "a", encoding="utf-8")
+
 def log(message: str):
-    """带时间戳的日志"""
+    """带时间戳的日志，同时写入文件"""
     timestamp = time.strftime("%H:%M:%S")
-    print(f"[{timestamp}] {message}", flush=True)
+    line = f"[{timestamp}] {message}"
+    print(line, flush=True)
+    if _log_file:
+        _log_file.write(line + "\n")
+        _log_file.flush()
 
 
 def get_gpu_memory_info() -> str:
@@ -555,12 +567,17 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # 创建输出目录
+    # 创建输出目录并初始化日志
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
+    init_log_file(str(output_dir))
 
     # 当前模型路径（每轮生成后会更新）
     current_model_path = args.model
+    train_start_time = time.time()
+    training_history = []
+    best_reward = float("-inf")
+    best_step = -1
 
     for epoch in range(args.epochs):
         log(f"\n{'='*60}")
@@ -738,12 +755,31 @@ def main():
             batch_rewards = all_flat_rewards_list[batch_start:batch_end]
             mean_reward = sum(batch_rewards) / len(batch_rewards)
 
+            # 记录每步指标
+            training_history.append({
+                "step": step + 1,
+                "loss": round(metrics["loss"], 4),
+                "policy_loss": round(metrics["policy_loss"], 4),
+                "kl_divergence": round(metrics["kl_divergence"], 4),
+                "reward": round(mean_reward, 3),
+            })
+
             if (step + 1) % 5 == 0 or step == 0:
                 log(f"  Step {step+1}/{num_steps} | "
                     f"loss={metrics['loss']:.4f} | "
                     f"policy={metrics['policy_loss']:.4f} | "
                     f"kl={metrics['kl_divergence']:.4f} | "
                     f"reward={mean_reward:.3f}")
+
+            # 保存最优 checkpoint（reward 最高 + KL 合理）
+            if mean_reward > best_reward and metrics["kl_divergence"] < 5.0:
+                best_reward = mean_reward
+                best_step = step + 1
+                best_path = output_dir / f"best-epoch{epoch+1}"
+                policy_model.save_pretrained(str(best_path))
+                tokenizer.save_pretrained(str(best_path))
+                log(f"  ★ 最优模型更新: step={best_step}, reward={best_reward:.3f}, "
+                    f"kl={metrics['kl_divergence']:.4f}")
 
             # 定期保存 checkpoint
             if (step + 1) % args.save_steps == 0:
@@ -788,9 +824,110 @@ def main():
     if Path(current_model_path).exists():
         shutil.copytree(current_model_path, final_model_path, dirs_exist_ok=True)
 
+    # 清理中间 checkpoint，只保留 best 和 final
+    log("清理中间 checkpoint...")
+    for ckpt_dir in output_dir.glob("checkpoint-*"):
+        if ckpt_dir.is_dir():
+            shutil.rmtree(str(ckpt_dir))
+            log(f"  已删除: {ckpt_dir.name}")
+    # epoch 目录也可以删（final 已经是拷贝）
+    for epoch_dir in output_dir.glob("epoch-*"):
+        if epoch_dir.is_dir():
+            shutil.rmtree(str(epoch_dir))
+            log(f"  已删除: {epoch_dir.name}")
+    log("  保留: final/, best-epoch*/, train.log, generate_cache, 训练报告")
+
+    # ========================================
+    # 生成训练报告
+    # ========================================
+    import platform
+    train_end_time = time.time()
+    train_duration = train_end_time - train_start_time
+
+    # 收集 GPU 信息
+    gpu_info = []
+    for i in range(torch.cuda.device_count()):
+        props = torch.cuda.get_device_properties(i)
+        gpu_info.append({
+            "index": i,
+            "name": props.name,
+            "total_memory_gb": round(props.total_mem / 1024**3, 1),
+        })
+
+    # 计算训练曲线统计
+    rewards = [h["reward"] for h in training_history]
+    losses = [h["loss"] for h in training_history]
+    kl_values = [h["kl_divergence"] for h in training_history]
+
+    report = {
+        "environment": {
+            "pytorch_version": torch.__version__,
+            "python_version": platform.python_version(),
+            "os": platform.platform(),
+            "num_gpus": torch.cuda.device_count(),
+            "gpus": gpu_info,
+        },
+        "training_time": {
+            "start_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(train_start_time)),
+            "end_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(train_end_time)),
+            "duration_seconds": round(train_duration),
+            "duration_human": f"{int(train_duration // 60)}分{int(train_duration % 60)}秒",
+        },
+        "training_config": {
+            "base_model": args.model,
+            "data_file": args.data,
+            "data_count": len(all_prompts),
+            "num_samples": args.num_samples,
+            "batch_size": args.batch_size,
+            "epochs": args.epochs,
+            "lr": args.lr,
+            "lora_rank": args.lora_rank,
+            "lora_alpha": args.lora_alpha,
+            "clip_epsilon": args.clip_epsilon,
+            "kl_coef": args.kl_coef,
+            "max_length": args.max_length,
+            "max_new_tokens": args.max_new_tokens,
+            "temperature": args.temperature,
+        },
+        "training_results": {
+            "total_steps": len(training_history),
+            "best_step": best_step,
+            "best_reward": round(best_reward, 3) if best_reward > float("-inf") else None,
+            "reward_start": rewards[0] if rewards else None,
+            "reward_end": rewards[-1] if rewards else None,
+            "reward_max": round(max(rewards), 3) if rewards else None,
+            "reward_min": round(min(rewards), 3) if rewards else None,
+            "reward_mean": round(sum(rewards) / len(rewards), 3) if rewards else None,
+            "loss_start": losses[0] if losses else None,
+            "loss_end": losses[-1] if losses else None,
+            "kl_start": kl_values[0] if kl_values else None,
+            "kl_end": kl_values[-1] if kl_values else None,
+            "kl_max": round(max(kl_values), 4) if kl_values else None,
+            "kl_mean": round(sum(kl_values) / len(kl_values), 4) if kl_values else None,
+        },
+        "training_history": training_history,
+    }
+
+    # 保存到 report 目录
+    report_dir = PROJECT_DIR / "report" / "grpo_report"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = report_dir / "grpo_train_report.json"
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    log(f"\n训练报告已保存: {report_path}")
+
+    # 同时保存一份到输出目录
+    output_report_path = output_dir / "grpo_train_report.json"
+    with open(output_report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
     print("\n" + "=" * 60)
     print("  GRPO 训练完成!")
     print(f"  最终模型: {final_model_path}")
+    if best_step > 0:
+        print(f"  最优模型: {output_dir / f'best-epoch{args.epochs}'} (step={best_step}, reward={best_reward:.3f})")
+    print(f"  训练报告: {report_path}")
+    print(f"  训练日志: {output_dir / 'train.log'}")
     print("=" * 60)
 
 

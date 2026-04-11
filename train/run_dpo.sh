@@ -101,10 +101,19 @@ else
     llamafactory-cli train ${TRAIN_CONFIG}
 fi
 
+# --- 生成 DPO 训练报告 ---
+echo ""
+echo "[4/4] 生成 DPO 训练报告..."
+python3 "${PROJECT_DIR}/train/generate_dpo_report.py" \
+    --output-dir "${PROJECT_DIR}/outputs/ustc-qa-dpo" \
+    --report-dir "${PROJECT_DIR}/report/dpo_report" \
+    --train-config "${PROJECT_DIR}/${TRAIN_CONFIG}"
+
 echo ""
 echo "=========================================="
 echo "  DPO 训练完成!"
 echo "  DPO LoRA 权重保存至: outputs/ustc-qa-dpo"
+echo "  训练报告: report/dpo_report/dpo_train_report.json"
 echo ""
 echo "  下一步: 合并 DPO LoRA 权重"
 echo "  python train/merge_lora.py \\"
