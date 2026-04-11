@@ -190,19 +190,144 @@ def generate_responses_vllm(
 
 
 # ============================================
-# Phase 2: 计算 log_prob（用 HF 模型）
+# Phase 2: 批量计算 log_prob（left-padding + attention_mask）
 # ============================================
 
-def compute_log_probs_batch(
+SYSTEM_PROMPT = (
+    "你是中国科学技术大学软件学院的智能问答助手。"
+    "请根据你的知识详细回答用户的问题，尽量提供具体的信息。"
+)
+
+
+def _prepare_sequences(
+    tokenizer: AutoTokenizer,
+    prompts: List[str],
+    responses: List[str],
+    max_length: int = 512,
+) -> Tuple[List[List[int]], List[int]]:
+    """
+    将 (prompt, response) 对编码为 token id 序列，并记录 response 起始位置
+
+    Returns:
+        all_full_ids: 每条的完整 token id 列表
+        all_response_starts: 每条的 response 起始位置
+    """
+    all_full_ids = []
+    all_response_starts = []
+
+    for prompt_text, response_text in zip(prompts, responses):
+        full_messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt_text},
+            {"role": "assistant", "content": response_text},
+        ]
+        full_text = tokenizer.apply_chat_template(
+            full_messages, tokenize=False, add_generation_prompt=False
+        )
+
+        prompt_messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt_text},
+        ]
+        prompt_text_only = tokenizer.apply_chat_template(
+            prompt_messages, tokenize=False, add_generation_prompt=True
+        )
+
+        full_ids = tokenizer.encode(full_text, add_special_tokens=False,
+                                     max_length=max_length, truncation=True)
+        prompt_ids = tokenizer.encode(prompt_text_only, add_special_tokens=False,
+                                       max_length=max_length, truncation=True)
+
+        all_full_ids.append(full_ids)
+        all_response_starts.append(len(prompt_ids))
+
+    return all_full_ids, all_response_starts
+
+
+def _pad_and_batch(
+    all_full_ids: List[List[int]],
+    pad_token_id: int,
+    device: torch.device,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Left-padding 并构建 attention_mask
+
+    Returns:
+        input_ids: [batch, max_len]
+        attention_mask: [batch, max_len]
+    """
+    max_len = max(len(ids) for ids in all_full_ids)
+    padded_ids = []
+    masks = []
+    for ids in all_full_ids:
+        pad_len = max_len - len(ids)
+        padded_ids.append([pad_token_id] * pad_len + ids)
+        masks.append([0] * pad_len + [1] * len(ids))
+
+    return (
+        torch.tensor(padded_ids, device=device),
+        torch.tensor(masks, device=device),
+    )
+
+
+def _extract_response_log_probs(
+    logits: torch.Tensor,
+    input_ids: torch.Tensor,
+    all_full_ids: List[List[int]],
+    all_response_starts: List[int],
+    max_len: int,
+) -> torch.Tensor:
+    """
+    从 batch logits 中提取每条 response 部分的 log_prob 之和
+
+    Args:
+        logits: [batch, max_len, vocab_size]
+        input_ids: [batch, max_len]
+        all_full_ids: 原始未 padding 的 token id
+        all_response_starts: response 起始位置（在原始序列中）
+        max_len: padding 后的最大长度
+
+    Returns:
+        log_probs: [batch] 的 log_prob 张量
+    """
+    log_probs_all = torch.nn.functional.log_softmax(logits, dim=-1)
+    batch_log_probs = []
+
+    for i in range(len(all_full_ids)):
+        seq_len = len(all_full_ids[i])
+        pad_len = max_len - seq_len
+        response_start = all_response_starts[i]
+
+        if response_start >= seq_len:
+            batch_log_probs.append(logits.new_tensor(-100.0))
+            continue
+
+        # 在 padded 序列中的绝对位置
+        abs_start = pad_len + response_start
+        abs_end = pad_len + seq_len
+
+        # logits[t] 预测 token[t+1]
+        resp_logits = log_probs_all[i, abs_start - 1: abs_end - 1, :]  # [resp_len, vocab]
+        resp_token_ids = input_ids[i, abs_start: abs_end]  # [resp_len]
+
+        token_lp = resp_logits.gather(1, resp_token_ids.unsqueeze(1)).squeeze(1)
+        batch_log_probs.append(token_lp.sum())
+
+    return torch.stack(batch_log_probs)
+
+
+def compute_log_probs_batched(
     model: AutoModelForCausalLM,
     tokenizer: AutoTokenizer,
     prompts: List[str],
     responses: List[str],
     device: torch.device,
     max_length: int = 512,
+    micro_batch_size: int = 8,
+    requires_grad: bool = False,
 ) -> torch.Tensor:
     """
-    计算一批 (prompt, response) 对的 response 部分 log_prob 之和
+    批量计算 log_prob（支持有/无梯度模式）
 
     Args:
         model: HF 模型
@@ -211,65 +336,42 @@ def compute_log_probs_batch(
         responses: 回答列表
         device: 计算设备
         max_length: 最大序列长度
+        micro_batch_size: 每个 micro batch 的大小
+        requires_grad: 是否保留梯度
 
     Returns:
-        log_probs: [batch_size] 的 log_prob 张量
+        log_probs: [total_size] 的 log_prob 张量
     """
-    system_prompt = (
-        "你是中国科学技术大学软件学院的智能问答助手。"
-        "请根据你的知识详细回答用户的问题，尽量提供具体的信息。"
+    all_full_ids, all_response_starts = _prepare_sequences(
+        tokenizer, prompts, responses, max_length
     )
 
+    pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
     all_log_probs = []
 
-    for prompt_text, response_text in zip(prompts, responses):
-        # 构建完整的 chat 序列
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt_text},
-            {"role": "assistant", "content": response_text},
-        ]
-        full_text = tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=False
+    for mb_start in range(0, len(prompts), micro_batch_size):
+        mb_end = min(mb_start + micro_batch_size, len(prompts))
+        mb_ids = all_full_ids[mb_start:mb_end]
+        mb_starts = all_response_starts[mb_start:mb_end]
+
+        input_ids, attention_mask = _pad_and_batch(mb_ids, pad_token_id, device)
+        max_len = input_ids.shape[1]
+
+        if requires_grad:
+            logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
+        else:
+            with torch.no_grad():
+                logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
+
+        mb_log_probs = _extract_response_log_probs(
+            logits, input_ids, mb_ids, mb_starts, max_len
         )
+        all_log_probs.append(mb_log_probs)
 
-        # 构建只到 assistant 开头的 prompt 部分，用于确定 response 起始位置
-        prompt_messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt_text},
-        ]
-        prompt_text_only = tokenizer.apply_chat_template(
-            prompt_messages, tokenize=False, add_generation_prompt=True
-        )
+        # 及时释放中间张量
+        del logits, input_ids, attention_mask
 
-        # tokenize
-        full_ids = tokenizer.encode(full_text, add_special_tokens=False, max_length=max_length, truncation=True)
-        prompt_ids = tokenizer.encode(prompt_text_only, add_special_tokens=False, max_length=max_length, truncation=True)
-
-        response_start = len(prompt_ids)
-
-        if response_start >= len(full_ids):
-            all_log_probs.append(torch.tensor(-100.0, device=device))
-            continue
-
-        input_ids = torch.tensor([full_ids], device=device)
-
-        with torch.no_grad():
-            logits = model(input_ids).logits  # [1, seq_len, vocab_size]
-
-        # 计算 response 部分的 log_prob
-        # logits[t] 预测 token[t+1]，所以 response token 从 response_start 开始
-        # 对应的 logits 从 response_start-1 开始
-        response_logits = logits[0, response_start - 1: len(full_ids) - 1, :]  # [resp_len, vocab]
-        response_token_ids = torch.tensor(full_ids[response_start:], device=device)  # [resp_len]
-
-        log_probs_all = torch.nn.functional.log_softmax(response_logits, dim=-1)
-        token_log_probs = log_probs_all.gather(1, response_token_ids.unsqueeze(1)).squeeze(1)
-        total_log_prob = token_log_probs.sum()
-
-        all_log_probs.append(total_log_prob)
-
-    return torch.stack(all_log_probs)
+    return torch.cat(all_log_probs)
 
 
 # ============================================
@@ -278,182 +380,89 @@ def compute_log_probs_batch(
 
 def grpo_train_step(
     model: AutoModelForCausalLM,
-    ref_model: AutoModelForCausalLM,
     tokenizer: AutoTokenizer,
     optimizer: torch.optim.Optimizer,
-    prompts: List[str],
-    grouped_responses: List[List[str]],
-    grouped_rewards: List[List[float]],
+    flat_prompts: List[str],
+    flat_responses: List[str],
+    advantages: torch.Tensor,
+    ref_log_probs: torch.Tensor,
     device: torch.device,
     clip_epsilon: float = 0.2,
     kl_coef: float = 0.002,
     max_length: int = 512,
+    micro_batch_size: int = 8,
 ) -> dict:
     """
-    执行一个 GRPO 训练 step
+    执行一个 GRPO 训练 step（已展平的数据）
 
     Args:
         model: 策略模型 (带 LoRA)
-        ref_model: 参考模型 (冻结)
         tokenizer: tokenizer
         optimizer: 优化器
-        prompts: 问题列表 [batch_size]
-        grouped_responses: 回答列表 [batch_size][num_samples]
-        grouped_rewards: 奖励列表 [batch_size][num_samples]
+        flat_prompts: 展平的问题列表 [batch_size * num_samples]
+        flat_responses: 展平的回答列表
+        advantages: 归一化后的 advantage [batch_size * num_samples]
+        ref_log_probs: 参考模型的 log_prob [batch_size * num_samples]
         device: 计算设备
         clip_epsilon: PPO clip 范围
         kl_coef: KL 散度惩罚系数
         max_length: 最大序列长度
+        micro_batch_size: micro batch 大小
 
     Returns:
         metrics: 训练指标字典
     """
     model.train()
-    num_samples = len(grouped_responses[0])
+    total_samples = len(flat_prompts)
+    num_micro_batches = math.ceil(total_samples / micro_batch_size)
 
-    # 计算 GRPO advantage: (reward - group_mean) / group_std
-    all_advantages = []
-    all_flat_prompts = []
-    all_flat_responses = []
-
-    for prompt_text, responses, rewards in zip(prompts, grouped_responses, grouped_rewards):
-        reward_tensor = torch.tensor(rewards, dtype=torch.float32)
-        mean_reward = reward_tensor.mean()
-        std_reward = reward_tensor.std()
-        if std_reward < 1e-8:
-            std_reward = torch.tensor(1.0)
-        advantages = (reward_tensor - mean_reward) / std_reward
-
-        for response_text, advantage in zip(responses, advantages):
-            all_flat_prompts.append(prompt_text)
-            all_flat_responses.append(response_text)
-            all_advantages.append(advantage)
-
-    advantages_tensor = torch.stack(all_advantages).to(device)
-
-    # 计算 ref model 的 log_prob（不需要梯度）
-    ref_model.eval()
-    with torch.no_grad():
-        ref_log_probs = compute_log_probs_batch(
-            ref_model, tokenizer, all_flat_prompts, all_flat_responses, device, max_length
-        )
-
-    # 计算当前策略的 log_prob（需要梯度）
-    model.train()
-    # 分 micro batch 计算，避免 OOM
-    micro_batch_size = 4
     total_loss = torch.tensor(0.0, device=device)
     total_policy_loss = torch.tensor(0.0, device=device)
     total_kl = torch.tensor(0.0, device=device)
-    num_micro_batches = 0
 
-    for mb_start in range(0, len(all_flat_prompts), micro_batch_size):
-        mb_end = min(mb_start + micro_batch_size, len(all_flat_prompts))
-        mb_prompts = all_flat_prompts[mb_start:mb_end]
-        mb_responses = all_flat_responses[mb_start:mb_end]
-        mb_advantages = advantages_tensor[mb_start:mb_end]
-        mb_ref_log_probs = ref_log_probs[mb_start:mb_end]
+    for mb_start in range(0, total_samples, micro_batch_size):
+        mb_end = min(mb_start + micro_batch_size, total_samples)
+        mb_prompts = flat_prompts[mb_start:mb_end]
+        mb_responses = flat_responses[mb_start:mb_end]
+        mb_advantages = advantages[mb_start:mb_end]
+        mb_ref_lp = ref_log_probs[mb_start:mb_end]
 
-        # 当前策略的 log_prob
-        current_log_probs = compute_log_probs_with_grad(
-            model, tokenizer, mb_prompts, mb_responses, device, max_length
+        # 当前策略的 log_prob（保留梯度）
+        current_lp = compute_log_probs_batched(
+            model, tokenizer, mb_prompts, mb_responses,
+            device, max_length, micro_batch_size=len(mb_prompts),
+            requires_grad=True,
         )
 
-        # log ratio = log(pi/pi_old)，这里用 ref 作为 pi_old
-        log_ratio = current_log_probs - mb_ref_log_probs.detach()
-        ratio = torch.exp(log_ratio)
-
         # PPO-clip 目标
+        log_ratio = current_lp - mb_ref_lp.detach()
+        ratio = torch.exp(log_ratio)
         surr1 = ratio * mb_advantages
         surr2 = torch.clamp(ratio, 1.0 - clip_epsilon, 1.0 + clip_epsilon) * mb_advantages
         policy_loss = -torch.min(surr1, surr2).mean()
 
-        # KL 散度惩罚 (low variance KL estimator)
-        kl_divergence = (mb_ref_log_probs.detach() - current_log_probs).mean()
+        # KL 散度惩罚
+        kl_divergence = (mb_ref_lp.detach() - current_lp).mean()
         kl_loss = kl_coef * kl_divergence
 
-        loss = (policy_loss + kl_loss) / math.ceil(len(all_flat_prompts) / micro_batch_size)
+        loss = (policy_loss + kl_loss) / num_micro_batches
         loss.backward()
 
         total_loss += loss.detach()
         total_policy_loss += policy_loss.detach()
         total_kl += kl_divergence.detach()
-        num_micro_batches += 1
 
     # 梯度更新
     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
     optimizer.zero_grad()
 
-    # 汇总指标
-    flat_rewards = [r for group in grouped_rewards for r in group]
     metrics = {
         "loss": total_loss.item(),
         "policy_loss": (total_policy_loss / num_micro_batches).item(),
         "kl_divergence": (total_kl / num_micro_batches).item(),
-        "mean_reward": sum(flat_rewards) / len(flat_rewards),
-        "max_reward": max(flat_rewards),
-        "min_reward": min(flat_rewards),
     }
     return metrics
-
-
-def compute_log_probs_with_grad(
-    model: AutoModelForCausalLM,
-    tokenizer: AutoTokenizer,
-    prompts: List[str],
-    responses: List[str],
-    device: torch.device,
-    max_length: int = 512,
-) -> torch.Tensor:
-    """计算 log_prob（保留梯度），逐条处理避免 padding 复杂度"""
-    system_prompt = (
-        "你是中国科学技术大学软件学院的智能问答助手。"
-        "请根据你的知识详细回答用户的问题，尽量提供具体的信息。"
-    )
-
-    all_log_probs = []
-
-    for prompt_text, response_text in zip(prompts, responses):
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt_text},
-            {"role": "assistant", "content": response_text},
-        ]
-        full_text = tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=False
-        )
-
-        prompt_messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt_text},
-        ]
-        prompt_text_only = tokenizer.apply_chat_template(
-            prompt_messages, tokenize=False, add_generation_prompt=True
-        )
-
-        full_ids = tokenizer.encode(full_text, add_special_tokens=False, max_length=max_length, truncation=True)
-        prompt_ids = tokenizer.encode(prompt_text_only, add_special_tokens=False, max_length=max_length, truncation=True)
-
-        response_start = len(prompt_ids)
-
-        if response_start >= len(full_ids):
-            all_log_probs.append(torch.tensor(-100.0, device=device, requires_grad=True))
-            continue
-
-        input_ids = torch.tensor([full_ids], device=device)
-        logits = model(input_ids).logits
-
-        response_logits = logits[0, response_start - 1: len(full_ids) - 1, :]
-        response_token_ids = torch.tensor(full_ids[response_start:], device=device)
-
-        log_probs_all = torch.nn.functional.log_softmax(response_logits, dim=-1)
-        token_log_probs = log_probs_all.gather(1, response_token_ids.unsqueeze(1)).squeeze(1)
-        total_log_prob = token_log_probs.sum()
-
-        all_log_probs.append(total_log_prob)
-
-    return torch.stack(all_log_probs)
 
 
 # ============================================
@@ -507,8 +516,6 @@ def main():
                         help="采样温度")
     parser.add_argument("--save-steps", type=int, default=50,
                         help="每多少步保存一次 checkpoint")
-    parser.add_argument("--generate-batch-size", type=int, default=256,
-                        help="vLLM 一次生成的 prompt 数量")
     args = parser.parse_args()
 
     print("=" * 60)
@@ -552,31 +559,19 @@ def main():
         log(f"{'='*60}")
 
         # ========================================
-        # Phase 1: vLLM 批量生成所有回答
+        # Phase 1: vLLM 一次性批量生成所有回答
         # ========================================
         log("\n[Phase 1] vLLM 批量生成回答...")
+        log(f"  共 {len(all_prompts)} 条 prompt × {args.num_samples} 采样")
 
-        # 分批生成（vLLM 内部会高效处理）
-        all_responses = []
-        all_token_ids = []
-
-        for gen_start in range(0, len(all_prompts), args.generate_batch_size):
-            gen_end = min(gen_start + args.generate_batch_size, len(all_prompts))
-            batch_prompts = all_prompts[gen_start:gen_end]
-
-            log(f"  生成批次 {gen_start//args.generate_batch_size + 1}: "
-                f"prompt {gen_start+1}-{gen_end}/{len(all_prompts)}")
-
-            batch_responses, batch_token_ids = generate_responses_vllm(
-                model_path=current_model_path,
-                tokenizer=tokenizer,
-                prompts=batch_prompts,
-                num_samples=args.num_samples,
-                max_new_tokens=args.max_new_tokens,
-                temperature=args.temperature,
-            )
-            all_responses.extend(batch_responses)
-            all_token_ids.extend(batch_token_ids)
+        all_responses, all_token_ids = generate_responses_vllm(
+            model_path=current_model_path,
+            tokenizer=tokenizer,
+            prompts=all_prompts,
+            num_samples=args.num_samples,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+        )
 
         # 计算所有 reward
         log("\n[Phase 1.5] 计算奖励...")
@@ -592,15 +587,38 @@ def main():
         log(f"  最低奖励: {min(flat_rewards):.3f}")
 
         # ========================================
-        # Phase 2: 加载模型 + LoRA 训练
+        # Phase 2: 展平数据 + 计算 advantage
         # ========================================
-        log("\n[Phase 2] 加载训练模型...")
-        free_gpu_memory()
+        log("\n[Phase 2] 计算 GRPO advantage...")
+        all_flat_prompts = []
+        all_flat_responses = []
+        all_advantages = []
+        all_flat_rewards_list = []
+
+        for prompt_text, responses, rewards in zip(all_prompts, all_responses, all_rewards):
+            reward_tensor = torch.tensor(rewards, dtype=torch.float32)
+            mean_reward = reward_tensor.mean()
+            std_reward = reward_tensor.std()
+            if std_reward < 1e-8:
+                std_reward = torch.tensor(1.0)
+            advantages = (reward_tensor - mean_reward) / std_reward
+
+            for response_text, advantage, reward_val in zip(responses, advantages, rewards):
+                all_flat_prompts.append(prompt_text)
+                all_flat_responses.append(response_text)
+                all_advantages.append(advantage)
+                all_flat_rewards_list.append(reward_val)
 
         device = torch.device("cuda:0")
+        advantages_tensor = torch.stack(all_advantages).to(device)
+        log(f"  展平后: {len(all_flat_prompts)} 条 (prompt, response) 对")
 
-        # 加载参考模型（冻结，用于 KL 散度）
-        log("  加载参考模型 (冻结)...")
+        # ========================================
+        # Phase 2.5: 加载 ref_model，计算所有 ref log_prob，然后释放
+        # ========================================
+        log("\n[Phase 2.5] 计算参考模型 log_prob...")
+        free_gpu_memory()
+
         ref_model = AutoModelForCausalLM.from_pretrained(
             current_model_path,
             trust_remote_code=True,
@@ -609,11 +627,23 @@ def main():
             local_files_only=True,
         )
         ref_model.eval()
-        for param in ref_model.parameters():
-            param.requires_grad = False
+        log(f"  参考模型加载完成: {get_gpu_memory_info()}")
 
-        # 加载策略模型 + LoRA
-        log("  加载策略模型 + LoRA...")
+        ref_log_probs = compute_log_probs_batched(
+            ref_model, tokenizer, all_flat_prompts, all_flat_responses,
+            device, args.max_length, micro_batch_size=16, requires_grad=False,
+        )
+        log(f"  ref log_prob 计算完成: shape={ref_log_probs.shape}")
+
+        # 释放 ref_model，腾出显存给 policy_model
+        del ref_model
+        free_gpu_memory()
+        log(f"  参考模型已释放: {get_gpu_memory_info()}")
+
+        # ========================================
+        # Phase 3: 加载 policy_model + LoRA 训练
+        # ========================================
+        log("\n[Phase 3] 加载策略模型 + LoRA...")
         from peft import LoraConfig, get_peft_model
 
         policy_model = AutoModelForCausalLM.from_pretrained(
@@ -639,43 +669,41 @@ def main():
             f"({trainable_params/total_params*100:.2f}%)")
         log(f"  显存: {get_gpu_memory_info()}")
 
-        # 优化器
         optimizer = torch.optim.AdamW(
             filter(lambda p: p.requires_grad, policy_model.parameters()),
             lr=args.lr,
             weight_decay=0.01,
         )
 
-        # ========================================
-        # Phase 3: GRPO 训练循环
-        # ========================================
-        log("\n[Phase 3] GRPO 训练...")
-        num_steps = len(all_prompts) // args.batch_size
-        log(f"  总步数: {num_steps}")
+        # GRPO 训练循环
+        log("\n  开始 GRPO 训练...")
+        num_samples_per_step = args.batch_size * args.num_samples  # 展平后每 step 的样本数
+        num_steps = len(all_flat_prompts) // num_samples_per_step
+        if num_steps == 0:
+            num_steps = 1
+            num_samples_per_step = len(all_flat_prompts)
+        log(f"  总步数: {num_steps} (每步 {num_samples_per_step} 条)")
 
-        epoch_metrics = {"loss": 0, "policy_loss": 0, "kl_divergence": 0, "mean_reward": 0}
+        epoch_metrics = {"loss": 0, "policy_loss": 0, "kl_divergence": 0}
         step_count = 0
 
         for step in range(num_steps):
-            batch_start = step * args.batch_size
-            batch_end = batch_start + args.batch_size
-
-            batch_prompts = all_prompts[batch_start:batch_end]
-            batch_responses = all_responses[batch_start:batch_end]
-            batch_rewards = all_rewards[batch_start:batch_end]
+            batch_start = step * num_samples_per_step
+            batch_end = min(batch_start + num_samples_per_step, len(all_flat_prompts))
 
             metrics = grpo_train_step(
                 model=policy_model,
-                ref_model=ref_model,
                 tokenizer=tokenizer,
                 optimizer=optimizer,
-                prompts=batch_prompts,
-                grouped_responses=batch_responses,
-                grouped_rewards=batch_rewards,
+                flat_prompts=all_flat_prompts[batch_start:batch_end],
+                flat_responses=all_flat_responses[batch_start:batch_end],
+                advantages=advantages_tensor[batch_start:batch_end],
+                ref_log_probs=ref_log_probs[batch_start:batch_end],
                 device=device,
                 clip_epsilon=args.clip_epsilon,
                 kl_coef=args.kl_coef,
                 max_length=args.max_length,
+                micro_batch_size=8,
             )
 
             step_count += 1
@@ -683,12 +711,16 @@ def main():
                 if key in metrics:
                     epoch_metrics[key] += metrics[key]
 
-            if (step + 1) % 10 == 0 or step == 0:
+            # 计算当前 batch 的平均 reward
+            batch_rewards = all_flat_rewards_list[batch_start:batch_end]
+            mean_reward = sum(batch_rewards) / len(batch_rewards)
+
+            if (step + 1) % 5 == 0 or step == 0:
                 log(f"  Step {step+1}/{num_steps} | "
                     f"loss={metrics['loss']:.4f} | "
                     f"policy={metrics['policy_loss']:.4f} | "
                     f"kl={metrics['kl_divergence']:.4f} | "
-                    f"reward={metrics['mean_reward']:.3f}")
+                    f"reward={mean_reward:.3f}")
 
             # 定期保存 checkpoint
             if (step + 1) % args.save_steps == 0:
@@ -701,11 +733,12 @@ def main():
         if step_count > 0:
             for key in epoch_metrics:
                 epoch_metrics[key] /= step_count
+        avg_reward = sum(all_flat_rewards_list) / len(all_flat_rewards_list)
         log(f"\n  Epoch {epoch+1} 平均指标:")
         log(f"    loss={epoch_metrics['loss']:.4f}")
         log(f"    policy_loss={epoch_metrics['policy_loss']:.4f}")
         log(f"    kl_divergence={epoch_metrics['kl_divergence']:.4f}")
-        log(f"    mean_reward={epoch_metrics['mean_reward']:.3f}")
+        log(f"    mean_reward={avg_reward:.3f}")
 
         # ========================================
         # Phase 4: 合并 LoRA 并保存
@@ -715,7 +748,7 @@ def main():
         merge_and_save_lora(policy_model, tokenizer, epoch_output)
 
         # 释放训练模型显存
-        del policy_model, ref_model, optimizer
+        del policy_model, optimizer, ref_log_probs, advantages_tensor
         free_gpu_memory()
 
         # 更新模型路径，下一轮用合并后的模型

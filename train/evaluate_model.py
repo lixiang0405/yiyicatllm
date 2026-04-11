@@ -1,5 +1,5 @@
 """
-SFT 训练后模型评测脚本
+SFT/DPO/GRPO 训练后模型评测脚本 (vLLM 加速版)
 评测维度:
   1. 文本重叠: ROUGE-L（词级别 bigram，适合中文长文本）
   2. 领域知识: 关键词命中率（中科大软件学院垂直领域词库）
@@ -8,11 +8,16 @@ SFT 训练后模型评测脚本
   5. 对比评测: 微调前 vs 微调后（贪心解码，结果可复现）
 
 用法:
+  # 评测合并后的模型（推荐）
+  python train/evaluate_model.py \
+      --merged-model /root/autodl-tmp/ustc-qa-dpo-merged \
+      --test-data data/eval_data.json
+
+  # 评测 LoRA 适配器（会先合并再用 vLLM 推理）
   python train/evaluate_model.py \
       --base-model Qwen/Qwen2.5-7B \
       --lora-adapter outputs/ustc-qa-lora \
-      --test-data data/qa_pairs.json \
-      --output outputs/eval_report.json
+      --test-data data/eval_data.json
 """
 
 # 离线模式：必须在 import transformers/huggingface_hub 之前设置
@@ -21,63 +26,110 @@ os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 import argparse
+import gc
 import json
 import re
 import time
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
 
-def load_model(base_model_path, lora_adapter_path=None):
-    """加载模型（支持基座模型和 LoRA 模型，离线模式）"""
+SYSTEM_PROMPT = "你是中科大智能问答助手，请详细、准确地回答用户的问题。回答控制在100-300字以内。"
+
+
+def load_vllm_model(model_path, tensor_parallel_size=None):
+    """加载 vLLM 模型用于批量推理"""
+    from vllm import LLM
+    from transformers import AutoTokenizer
+
+    if tensor_parallel_size is None:
+        tensor_parallel_size = torch.cuda.device_count()
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_path, trust_remote_code=True, local_files_only=True
+    )
+
+    llm = LLM(
+        model=model_path,
+        trust_remote_code=True,
+        tensor_parallel_size=tensor_parallel_size,
+        dtype="bfloat16",
+        gpu_memory_utilization=0.85,
+        enforce_eager=True,
+    )
+
+    return llm, tokenizer
+
+
+def merge_lora_to_temp(base_model_path, lora_adapter_path):
+    """合并 LoRA 到临时目录，返回合并后的路径"""
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from peft import PeftModel
+    import tempfile
+
+    print("  合并 LoRA 权重到临时目录...")
     tokenizer = AutoTokenizer.from_pretrained(
         base_model_path, trust_remote_code=True, local_files_only=True
     )
-
     model = AutoModelForCausalLM.from_pretrained(
         base_model_path,
-        dtype=torch.bfloat16,
+        torch_dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True,
         local_files_only=True,
     )
+    model = PeftModel.from_pretrained(model, lora_adapter_path)
+    model = model.merge_and_unload()
 
-    if lora_adapter_path:
-        model = PeftModel.from_pretrained(model, lora_adapter_path)
-        model = model.merge_and_unload()
+    temp_dir = tempfile.mkdtemp(prefix="eval_merged_")
+    model.save_pretrained(temp_dir)
+    tokenizer.save_pretrained(temp_dir)
 
-    model.eval()
-    return model, tokenizer
+    del model
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    print(f"  合并完成: {temp_dir}")
+    return temp_dir
 
 
-def generate_answer(model, tokenizer, question, max_new_tokens=512):
-    """生成单个回答"""
-    messages = [
-        {"role": "system", "content": "你是中科大智能问答助手，请详细、准确地回答用户的问题。回答控制在100-300字以内。"},
-        {"role": "user", "content": question},
-    ]
-    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+def generate_answers_batch(llm, tokenizer, questions, max_new_tokens=512):
+    """用 vLLM 批量生成回答"""
+    from vllm import SamplingParams
+
+    sampling_params = SamplingParams(
+        temperature=0,
+        max_tokens=max_new_tokens,
+        repetition_penalty=1.2,
+        stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
+    )
+
+    formatted_prompts = []
+    for question in questions:
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": question},
+        ]
+        formatted = tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+        formatted_prompts.append(formatted)
 
     start_time = time.perf_counter()
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            do_sample=False,
-            repetition_penalty=1.2,
-        )
-    generation_time = time.perf_counter() - start_time
+    outputs = llm.generate(formatted_prompts, sampling_params)
+    total_time = time.perf_counter() - start_time
 
-    generated_ids = outputs[0][inputs["input_ids"].shape[1]:]
-    answer = tokenizer.decode(generated_ids, skip_special_tokens=True)
-    output_tokens = len(generated_ids)
+    answers = []
+    total_tokens = 0
+    for output in outputs:
+        text = output.outputs[0].text.strip()
+        num_tokens = len(output.outputs[0].token_ids)
+        answers.append(text)
+        total_tokens += num_tokens
 
-    return answer, generation_time, output_tokens
-
+    avg_time = total_time / len(questions) if questions else 0
+    return answers, total_time, total_tokens, avg_time
 
 def _tokenize_chinese(text):
     """简易中文分词：按字符 bigram 切分，兼顾英文单词完整性"""
@@ -238,32 +290,29 @@ def compute_format_score(generated):
 
 
 def evaluate_model(
-    model,
+    llm,
     tokenizer,
     test_data: List[Dict],
     num_samples: int = 50,
     model_label: str = "lora",
 ):
-    """对模型进行全面评测"""
-    # 采样测试数据
+    """对模型进行全面评测（vLLM 批量推理）"""
     import random
     random.seed(42)
     samples = random.sample(test_data, min(num_samples, len(test_data)))
 
-    results = []
-    total_tokens = 0
-    total_generation_time = 0.0
+    questions = [item["instruction"] for item in samples]
+    references = [item["output"] for item in samples]
 
     print(f"\n  评测 [{model_label}] 模型，共 {len(samples)} 条测试数据...")
+    print(f"  使用 vLLM 批量推理...")
 
-    for i, item in enumerate(samples):
-        question = item["instruction"]
-        reference = item["output"]
+    answers, total_time, total_tokens, avg_time = generate_answers_batch(
+        llm, tokenizer, questions
+    )
 
-        generated, gen_time, output_tokens = generate_answer(model, tokenizer, question)
-        total_tokens += output_tokens
-        total_generation_time += gen_time
-
+    results = []
+    for question, reference, generated in zip(questions, references, answers):
         rouge_l = compute_rouge_l(reference, generated)
         keyword_hit = compute_keyword_hit_rate(question, reference, generated)
         length_ratio, length_reasonable = compute_length_ratio(reference, generated)
@@ -281,15 +330,9 @@ def evaluate_model(
             "length_reasonable": length_reasonable,
             "format_score": format_score,
             "miss_facts": miss_facts[:5],
-            "generation_time_seconds": round(gen_time, 3),
-            "output_tokens": output_tokens,
         }
         results.append(result)
 
-        if (i + 1) % 10 == 0:
-            print(f"    进度: {i+1}/{len(samples)}")
-
-    # 汇总指标
     num_results = len(results)
     length_abnormal_count = sum(1 for r in results if not r["length_reasonable"])
 
@@ -302,55 +345,67 @@ def evaluate_model(
         "avg_length_ratio": round(sum(r["length_ratio"] for r in results) / num_results, 2),
         "length_abnormal_ratio": round(length_abnormal_count / num_results, 4),
         "avg_format_score": round(sum(r["format_score"] for r in results) / num_results, 2),
-        "avg_generation_time_seconds": round(total_generation_time / num_results, 3),
-        "avg_tokens_per_second": round(total_tokens / total_generation_time, 1) if total_generation_time > 0 else 0,
+        "total_generation_time_seconds": round(total_time, 2),
+        "avg_tokens_per_second": round(total_tokens / total_time, 1) if total_time > 0 else 0,
         "total_output_tokens": total_tokens,
     }
 
     return summary, results
 
 
-def run_comparison(base_model_path, lora_adapter_path, test_data, num_samples):
-    """对比评测：基座模型 vs LoRA 微调模型"""
+def free_vllm(llm):
+    """释放 vLLM 模型显存"""
+    del llm
+    gc.collect()
+    torch.cuda.empty_cache()
+
+
+def run_comparison(model_path, base_model_path, test_data, num_samples):
+    """对比评测：基座模型 vs 微调模型"""
     all_summaries = {}
     all_details = {}
 
-    # 评测 LoRA 微调模型
-    print("\n[1/2] 加载 LoRA 微调模型...")
-    lora_model, tokenizer = load_model(base_model_path, lora_adapter_path)
-    lora_summary, lora_details = evaluate_model(lora_model, tokenizer, test_data, num_samples, "lora_finetuned")
-    all_summaries["lora_finetuned"] = lora_summary
-    all_details["lora_finetuned"] = lora_details
-
-    # 释放显存
-    del lora_model
-    torch.cuda.empty_cache()
+    # 评测微调模型
+    print("\n[1/2] 加载微调模型...")
+    llm, tokenizer = load_vllm_model(model_path)
+    finetuned_summary, finetuned_details = evaluate_model(
+        llm, tokenizer, test_data, num_samples, "finetuned"
+    )
+    all_summaries["lora_finetuned"] = finetuned_summary
+    all_details["lora_finetuned"] = finetuned_details
+    free_vllm(llm)
 
     # 评测基座模型
-    print("\n[2/2] 加载基座模型 (对比基准)...")
-    base_model, tokenizer = load_model(base_model_path, lora_adapter_path=None)
-    base_summary, base_details = evaluate_model(base_model, tokenizer, test_data, num_samples, "base_model")
-    all_summaries["base_model"] = base_summary
-    all_details["base_model"] = base_details
-
-    del base_model
-    torch.cuda.empty_cache()
+    if base_model_path and Path(base_model_path).exists():
+        print("\n[2/2] 加载基座模型 (对比基准)...")
+        llm, tokenizer = load_vllm_model(base_model_path)
+        base_summary, base_details = evaluate_model(
+            llm, tokenizer, test_data, num_samples, "base_model"
+        )
+        all_summaries["base_model"] = base_summary
+        all_details["base_model"] = base_details
+        free_vllm(llm)
+    else:
+        print("\n[2/2] 跳过基座模型评测（未指定或路径不存在）")
 
     return all_summaries, all_details
-
-
 def print_comparison(summaries):
     """打印对比结果"""
     print(f"\n{'='*65}")
     print(f"  模型评测对比报告")
     print(f"{'='*65}")
 
-    header = f"  {'指标':<25} {'基座模型':>15} {'LoRA微调':>15}"
-    print(header)
-    print(f"  {'-'*55}")
-
     base = summaries.get("base_model", {})
     lora = summaries.get("lora_finetuned", {})
+
+    if base:
+        header = f"  {'指标':<25} {'基座模型':>15} {'微调模型':>15}"
+        print(header)
+        print(f"  {'-'*55}")
+    else:
+        header = f"  {'指标':<25} {'微调模型':>15}"
+        print(header)
+        print(f"  {'-'*40}")
 
     metrics = [
         ("ROUGE-L", "avg_rouge_l", True),
@@ -359,53 +414,123 @@ def print_comparison(summaries):
         ("长度比 (生成/参考)", "avg_length_ratio", False),
         ("长度异常比例", "length_abnormal_ratio", False),
         ("格式质量分", "avg_format_score", True),
-        ("平均生成速度 (tok/s)", "avg_tokens_per_second", False),
-        ("平均生成耗时 (s)", "avg_generation_time_seconds", False),
+        ("生成速度 (tok/s)", "avg_tokens_per_second", False),
+        ("总生成耗时 (s)", "total_generation_time_seconds", False),
     ]
 
     for label, key, higher_is_better in metrics:
-        base_val = base.get(key, 0)
         lora_val = lora.get(key, 0)
 
-        if higher_is_better and lora_val > base_val:
-            indicator = " ↑"
-        elif higher_is_better and lora_val < base_val:
-            indicator = " ↓"
+        if base:
+            base_val = base.get(key, 0)
+            if higher_is_better and lora_val > base_val:
+                indicator = " ↑"
+            elif higher_is_better and lora_val < base_val:
+                indicator = " ↓"
+            else:
+                indicator = ""
+            print(f"  {label:<25} {base_val:>15} {lora_val:>13}{indicator}")
         else:
-            indicator = ""
-
-        print(f"  {label:<25} {base_val:>15} {lora_val:>13}{indicator}")
+            print(f"  {label:<25} {lora_val:>15}")
 
     print(f"{'='*65}")
 
 
+def print_single_summary(summary):
+    """打印单个模型的评测结果"""
+    print(f"\n{'='*55}")
+    print(f"  模型评测报告 [{summary.get('model_label', '')}]")
+    print(f"{'='*55}")
+    print(f"  {'评测样本数':<25} {summary['num_samples']:>15}")
+    print(f"  {'ROUGE-L':<25} {summary['avg_rouge_l']:>15}")
+    print(f"  {'关键词命中率':<25} {summary['avg_keyword_hit_rate']:>15}")
+    print(f"  {'事实命中率':<25} {summary['avg_fact_hit_rate']:>15}")
+    print(f"  {'长度比 (生成/参考)':<25} {summary['avg_length_ratio']:>15}")
+    print(f"  {'长度异常比例':<25} {summary['length_abnormal_ratio']:>15}")
+    print(f"  {'格式质量分':<25} {summary['avg_format_score']:>15}")
+    print(f"  {'生成速度 (tok/s)':<25} {summary['avg_tokens_per_second']:>15}")
+    print(f"  {'总生成耗时 (s)':<25} {summary['total_generation_time_seconds']:>15}")
+    print(f"{'='*55}")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="SFT 训练后模型评测")
-    parser.add_argument("--base-model", type=str, default="Qwen/Qwen2.5-7B", help="基座模型路径")
-    parser.add_argument("--lora-adapter", type=str, default="outputs/ustc-qa-lora", help="LoRA 适配器路径")
-    parser.add_argument("--test-data", type=str, default="data/preference_data.json", help="测试数据路径（支持 SFT 格式和偏好数据格式）")
-    parser.add_argument("--num-samples", type=int, default=300, help="评测样本数")
-    parser.add_argument("--output", type=str, default="outputs/eval_report.json", help="评测报告输出路径")
-    parser.add_argument("--skip-base", action="store_true", help="跳过基座模型评测（省时间）")
+    parser = argparse.ArgumentParser(description="模型评测 (vLLM 加速)")
+    parser.add_argument("--merged-model", type=str, default=None,
+                        help="合并后的模型路径（推荐，直接用 vLLM 推理）")
+    parser.add_argument("--base-model", type=str, default=None,
+                        help="基座模型路径（用于 LoRA 合并或对比评测）")
+    parser.add_argument("--lora-adapter", type=str, default=None,
+                        help="LoRA 适配器路径（会先合并再用 vLLM 推理）")
+    parser.add_argument("--test-data", type=str, default="data/eval_data.json",
+                        help="测试数据路径（默认使用验证集）")
+    parser.add_argument("--num-samples", type=int, default=200,
+                        help="评测样本数（默认 200，设为 0 则使用全部数据）")
+    parser.add_argument("--output", type=str, default="outputs/eval_report.json",
+                        help="评测报告输出路径")
+    parser.add_argument("--skip-base", action="store_true",
+                        help="跳过基座模型对比评测")
     args = parser.parse_args()
+
+    # 确定要评测的模型路径
+    model_path = args.merged_model
+    temp_merged_dir = None
+
+    if model_path is None:
+        if args.base_model and args.lora_adapter:
+            # 需要先合并 LoRA
+            temp_merged_dir = merge_lora_to_temp(args.base_model, args.lora_adapter)
+            model_path = temp_merged_dir
+        elif args.base_model:
+            model_path = args.base_model
+        else:
+            # 默认路径
+            for default_path in [
+                "/root/autodl-tmp/ustc-qa-dpo-merged",
+                "/root/autodl-tmp/ustc-qa-merged",
+            ]:
+                if Path(default_path).exists():
+                    model_path = default_path
+                    break
+            if model_path is None:
+                print("[ERROR] 未指定模型路径，请使用 --merged-model 或 --base-model + --lora-adapter")
+                return
+
+    print(f"  评测模型: {model_path}")
 
     # 加载测试数据
     print("加载测试数据...")
-    with open(args.test_data, "r", encoding="utf-8") as f:
-        test_data = json.load(f)
-    print(f"  测试数据: {len(test_data)} 条")
+    test_data_path = Path(args.test_data)
+    if not test_data_path.exists():
+        # 回退到其他数据文件
+        for fallback in ["data/preference_data.json", "data/qa_pairs.json"]:
+            if Path(fallback).exists():
+                test_data_path = Path(fallback)
+                print(f"  [WARNING] {args.test_data} 不存在，回退使用: {fallback}")
+                break
+        else:
+            print(f"[ERROR] 找不到测试数据文件: {args.test_data}")
+            return
 
-    if args.skip_base:
-        # 只评测 LoRA 模型
-        print("\n加载 LoRA 微调模型...")
-        model, tokenizer = load_model(args.base_model, args.lora_adapter)
-        summary, details = evaluate_model(model, tokenizer, test_data, args.num_samples, "lora_finetuned")
+    with open(test_data_path, "r", encoding="utf-8") as f:
+        test_data = json.load(f)
+
+    num_samples = args.num_samples if args.num_samples > 0 else len(test_data)
+    print(f"  测试数据: {len(test_data)} 条，评测: {min(num_samples, len(test_data))} 条")
+
+    if args.skip_base or not args.base_model:
+        # 只评测微调模型
+        llm, tokenizer = load_vllm_model(model_path)
+        summary, details = evaluate_model(
+            llm, tokenizer, test_data, num_samples, "finetuned"
+        )
         summaries = {"lora_finetuned": summary}
         all_details = {"lora_finetuned": details}
+        free_vllm(llm)
+        print_single_summary(summary)
     else:
         # 对比评测
         summaries, all_details = run_comparison(
-            args.base_model, args.lora_adapter, test_data, args.num_samples
+            model_path, args.base_model, test_data, num_samples
         )
         print_comparison(summaries)
 
@@ -415,10 +540,10 @@ def main():
 
     report = {
         "config": {
+            "model": model_path,
             "base_model": args.base_model,
-            "lora_adapter": args.lora_adapter,
-            "test_data": args.test_data,
-            "num_samples": args.num_samples,
+            "test_data": str(test_data_path),
+            "num_samples": num_samples,
         },
         "summaries": summaries,
         "sample_details": {k: v[:10] for k, v in all_details.items()},
@@ -428,6 +553,12 @@ def main():
         json.dump(report, f, ensure_ascii=False, indent=2)
 
     print(f"\n评测报告已保存至: {output_path}")
+
+    # 清理临时目录
+    if temp_merged_dir:
+        import shutil
+        shutil.rmtree(temp_merged_dir, ignore_errors=True)
+        print(f"  已清理临时目录: {temp_merged_dir}")
 
 
 if __name__ == "__main__":
