@@ -94,14 +94,20 @@ def free_gpu_memory():
 
 
 def load_prompts(data_path: str) -> List[str]:
-    """从 parquet 文件加载 prompt（提取 user content）"""
-    dataframe = pd.read_parquet(data_path)
-    prompts = []
-    for raw_prompt in dataframe["prompt"]:
-        messages = json.loads(raw_prompt)
-        user_content = messages[0]["content"]
-        prompts.append(user_content)
-    return prompts
+    """从 parquet 或 JSON 文件加载 prompt"""
+    if data_path.endswith(".json"):
+        with open(data_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        prompts = [item["instruction"] for item in data]
+        return prompts
+    else:
+        dataframe = pd.read_parquet(data_path)
+        prompts = []
+        for raw_prompt in dataframe["prompt"]:
+            messages = json.loads(raw_prompt)
+            user_content = messages[0]["content"]
+            prompts.append(user_content)
+        return prompts
 
 
 # ============================================
