@@ -84,8 +84,8 @@ python3 "${PROJECT_DIR}/train/train_grpo.py" \
     --merged-output "${MERGED_OUTPUT}" \
     --num-samples 4 \
     --batch-size 16 \
-    --epochs 3 \
-    --max-steps 50 \
+    --epochs 6 \
+    --max-steps 80 \
     --lr 1e-5 \
     --lora-rank 64 \
     --lora-alpha 128 \

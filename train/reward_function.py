@@ -66,8 +66,8 @@ def _length_reward(response: str) -> float:
     长度奖励: 鼓励 100-300 字的回答 (与 SFT 训练数据一致)
     太短 (<50): 信息不足
     适中 (100-300): 最佳
-    稍长 (300-500): 可接受但不鼓励
-    太长 (>500): 啰嗦
+    稍长 (300-500): 轻微惩罚
+    太长 (>500): 明显惩罚，越长惩罚越重
     """
     length = len(response)
 
@@ -80,9 +80,13 @@ def _length_reward(response: str) -> float:
     elif length <= 300:
         return 2.0
     elif length <= 500:
-        return 1.0
+        return 0.5
+    elif length <= 800:
+        return -1.0
     else:
-        return 0.0
+        # 超过 800 字，每多 200 字多扣 0.5，最多扣到 -3.0
+        extra_penalty = min((length - 800) / 200 * 0.5, 2.0)
+        return -1.0 - extra_penalty
 
 
 def _format_reward(response: str) -> float:
