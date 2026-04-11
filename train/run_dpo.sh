@@ -14,7 +14,7 @@ set -e
 
 TRAIN_CONFIG="train/train_dpo.yaml"
 LLAMA_FACTORY_DIR="LLaMA-Factory"
-DPO_TRAIN_DATA_FILE="$(pwd)/data/dpo_train_data.json"
+DPO_TRAIN_DATA_FILE="$(pwd)/data/dpo_all_train_data.json"
 DPO_EVAL_DATA_FILE="$(pwd)/data/eval_data.json"
 
 echo "=========================================="

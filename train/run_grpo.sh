@@ -86,9 +86,9 @@ python3 "${PROJECT_DIR}/train/train_grpo.py" \
     --batch-size 16 \
     --epochs 3 \
     --max-steps 50 \
-    --lr 5e-6 \
-    --lora-rank 32 \
-    --lora-alpha 64 \
+    --lr 1e-5 \
+    --lora-rank 64 \
+    --lora-alpha 128 \
     --clip-epsilon 0.2 \
     --kl-coef 0.05 \
     --max-length 512 \

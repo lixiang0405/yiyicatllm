@@ -10,7 +10,7 @@ set -e
 # --- 配置 ---
 TRAIN_CONFIG="train/train_lora.yaml"
 LLAMA_FACTORY_DIR="LLaMA-Factory"
-DATA_FILE="$(pwd)/data/new_qa.json"
+DATA_FILE="$(pwd)/data/sft_train_data.json"
 PREF_DATA_FILE="$(pwd)/data/preference_data.json"
 EVAL_DATA_FILE="$(pwd)/data/eval_data.json"
 DPO_TRAIN_DATA_FILE="$(pwd)/data/dpo_train_data.json"
@@ -98,7 +98,7 @@ echo "[2/6] 检查训练数据..."
 if [ ! -f "${DATA_FILE}" ]; then
     echo "  [WARN] new_qa.json 不存在，使用 sample_data.json"
     cp data/sample_data.json data/new_qa.json
-    DATA_FILE="$(pwd)/data/new_qa.json"
+    DATA_FILE="$(pwd)/data/sft_train_data.json"
 fi
 
 DATA_COUNT=$(python3 -c "import json; print(len(json.load(open('${DATA_FILE}'))))")
