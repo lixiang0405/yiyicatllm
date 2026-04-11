@@ -68,7 +68,7 @@ def get_gpu_memory_info() -> str:
     info_parts = []
     for i in range(torch.cuda.device_count()):
         used = torch.cuda.memory_allocated(i) / 1024**3
-        total = torch.cuda.get_device_properties(i).total_mem / 1024**3
+        total = torch.cuda.get_device_properties(i).total_memory / 1024**3
         info_parts.append(f"GPU{i}: {used:.1f}/{total:.1f}GB")
     return " | ".join(info_parts)
 
