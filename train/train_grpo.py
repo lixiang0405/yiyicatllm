@@ -647,11 +647,10 @@ def main():
             current_model_path,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
             local_files_only=True,
-        )
+        ).to(device)
         ref_model.eval()
-        log(f"  参考模型加载完成: {get_gpu_memory_info()}")
+        log(f"  参考模型加载完成 (单卡 {device}): {get_gpu_memory_info()}")
 
         ref_log_probs = compute_log_probs_batched(
             ref_model, tokenizer, all_flat_prompts, all_flat_responses,
