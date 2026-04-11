@@ -360,80 +360,111 @@ def free_vllm(llm):
     torch.cuda.empty_cache()
 
 
-def run_comparison(model_path, base_model_path, test_data, num_samples):
-    """对比评测：基座模型 vs 微调模型"""
+def run_multi_comparison(model_configs, test_data, num_samples):
+    """多模型对比评测
+
+    Args:
+        model_configs: [(label, path), ...] 模型标签和路径列表
+        test_data: 测试数据
+        num_samples: 评测样本数
+
+    Returns:
+        all_summaries: {label: summary}
+        all_details: {label: details}
+    """
     all_summaries = {}
     all_details = {}
+    total = len(model_configs)
 
-    # 评测微调模型
-    print("\n[1/2] 加载微调模型...")
-    llm, tokenizer = load_vllm_model(model_path)
-    finetuned_summary, finetuned_details = evaluate_model(
-        llm, tokenizer, test_data, num_samples, "finetuned"
-    )
-    all_summaries["lora_finetuned"] = finetuned_summary
-    all_details["lora_finetuned"] = finetuned_details
-    free_vllm(llm)
+    for idx, (label, model_path) in enumerate(model_configs, 1):
+        if not Path(model_path).exists():
+            print(f"\n[{idx}/{total}] 跳过 [{label}]（路径不存在: {model_path}）")
+            continue
 
-    # 评测基座模型
-    if base_model_path and Path(base_model_path).exists():
-        print("\n[2/2] 加载基座模型 (对比基准)...")
-        llm, tokenizer = load_vllm_model(base_model_path)
-        base_summary, base_details = evaluate_model(
-            llm, tokenizer, test_data, num_samples, "base_model"
+        print(f"\n[{idx}/{total}] 加载 [{label}] 模型: {model_path}")
+        llm, tokenizer = load_vllm_model(model_path)
+        summary, details = evaluate_model(
+            llm, tokenizer, test_data, num_samples, label
         )
-        all_summaries["base_model"] = base_summary
-        all_details["base_model"] = base_details
+        all_summaries[label] = summary
+        all_details[label] = details
         free_vllm(llm)
-    else:
-        print("\n[2/2] 跳过基座模型评测（未指定或路径不存在）")
+        print(f"  [{label}] 评测完成")
 
     return all_summaries, all_details
-def print_comparison(summaries):
-    """打印对比结果"""
-    print(f"\n{'='*65}")
-    print(f"  模型评测对比报告")
-    print(f"{'='*65}")
 
-    base = summaries.get("base_model", {})
-    lora = summaries.get("lora_finetuned", {})
+def print_multi_comparison(summaries):
+    """打印多模型对比结果"""
+    if not summaries:
+        print("  没有可用的评测结果")
+        return
 
-    if base:
-        header = f"  {'指标':<25} {'基座模型':>15} {'微调模型':>15}"
-        print(header)
-        print(f"  {'-'*55}")
-    else:
-        header = f"  {'指标':<25} {'微调模型':>15}"
-        print(header)
-        print(f"  {'-'*40}")
+    labels = list(summaries.keys())
+    col_width = 12
+
+    print(f"\n{'='*80}")
+    print(f"  多模型对比评测报告")
+    print(f"{'='*80}")
+
+    # 表头
+    header = f"  {'指标':<20}"
+    for label in labels:
+        header += f" {label:>{col_width}}"
+    print(header)
+    print(f"  {'-'*(20 + (col_width + 1) * len(labels))}")
 
     metrics = [
         ("ROUGE-L", "avg_rouge_l", True),
         ("关键词命中率", "avg_keyword_hit_rate", True),
         ("事实命中率", "avg_fact_hit_rate", True),
-        ("长度比 (生成/参考)", "avg_length_ratio", False),
+        ("长度比", "avg_length_ratio", False),
         ("长度异常比例", "length_abnormal_ratio", False),
         ("格式质量分", "avg_format_score", True),
-        ("生成速度 (tok/s)", "avg_tokens_per_second", False),
-        ("总生成耗时 (s)", "total_generation_time_seconds", False),
+        ("生成速度(tok/s)", "avg_tokens_per_second", False),
+        ("耗时(s)", "total_generation_time_seconds", False),
     ]
 
-    for label, key, higher_is_better in metrics:
-        lora_val = lora.get(key, 0)
+    # 找到第一个模型作为基准（通常是基座模型）
+    base_label = labels[0]
 
-        if base:
-            base_val = base.get(key, 0)
-            if higher_is_better and lora_val > base_val:
-                indicator = " ↑"
-            elif higher_is_better and lora_val < base_val:
-                indicator = " ↓"
+    for metric_name, key, higher_is_better in metrics:
+        row = f"  {metric_name:<20}"
+        base_val = summaries[base_label].get(key, 0)
+
+        for label in labels:
+            val = summaries[label].get(key, 0)
+            if label == base_label or not higher_is_better:
+                row += f" {val:>{col_width}}"
             else:
-                indicator = ""
-            print(f"  {label:<25} {base_val:>15} {lora_val:>13}{indicator}")
-        else:
-            print(f"  {label:<25} {lora_val:>15}")
+                if val > base_val:
+                    row += f" {val:>{col_width-1}}↑"
+                elif val < base_val:
+                    row += f" {val:>{col_width-1}}↓"
+                else:
+                    row += f" {val:>{col_width}}"
+        print(row)
 
-    print(f"{'='*65}")
+    print(f"{'='*80}")
+
+    # 打印提升幅度（相对于基座模型）
+    if len(labels) >= 2:
+        print(f"\n  相对于 [{base_label}] 的提升:")
+        key_metrics = [
+            ("ROUGE-L", "avg_rouge_l"),
+            ("关键词命中率", "avg_keyword_hit_rate"),
+            ("事实命中率", "avg_fact_hit_rate"),
+            ("格式质量分", "avg_format_score"),
+        ]
+        for label in labels[1:]:
+            print(f"  [{label}]:")
+            for metric_name, key in key_metrics:
+                base_val = summaries[base_label].get(key, 0)
+                cur_val = summaries[label].get(key, 0)
+                diff = cur_val - base_val
+                pct = (diff / base_val * 100) if base_val > 0 else 0
+                sign = "+" if diff >= 0 else ""
+                print(f"    {metric_name}: {sign}{diff:.4f} ({sign}{pct:.1f}%)")
+        print()
 
 
 def print_single_summary(summary):
@@ -454,9 +485,26 @@ def print_single_summary(summary):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="模型评测 (vLLM 加速)")
+    parser = argparse.ArgumentParser(
+        description="多模型对比评测 (vLLM 加速)",
+        epilog="""
+用法示例:
+  # 多模型对比评测（推荐）
+  python train/evaluate_model.py --models \\
+      "基座:/root/autodl-tmp/Qwen2.5-7B" \\
+      "LoRA:/root/autodl-tmp/ustc-qa-merged" \\
+      "DPO:/root/autodl-tmp/ustc-qa-dpo-merged" \\
+      "GRPO:/root/autodl-tmp/ustc-qa-grpo-merged/epoch-3"
+
+  # 单模型评测
+  python train/evaluate_model.py --merged-model /root/autodl-tmp/ustc-qa-dpo-merged
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--models", nargs="+", type=str, default=None,
+                        help='多模型对比，格式: "标签:模型路径"，如 "基座:/path/to/base" "LoRA:/path/to/lora"')
     parser.add_argument("--merged-model", type=str, default=None,
-                        help="合并后的模型路径（推荐，直接用 vLLM 推理）")
+                        help="合并后的模型路径（单模型评测时使用）")
     parser.add_argument("--base-model", type=str, default=None,
                         help="基座模型路径（用于 LoRA 合并或对比评测）")
     parser.add_argument("--lora-adapter", type=str, default=None,
@@ -471,37 +519,10 @@ def main():
                         help="跳过基座模型对比评测")
     args = parser.parse_args()
 
-    # 确定要评测的模型路径
-    model_path = args.merged_model
-    temp_merged_dir = None
-
-    if model_path is None:
-        if args.base_model and args.lora_adapter:
-            # 需要先合并 LoRA
-            temp_merged_dir = merge_lora_to_temp(args.base_model, args.lora_adapter)
-            model_path = temp_merged_dir
-        elif args.base_model:
-            model_path = args.base_model
-        else:
-            # 默认路径
-            for default_path in [
-                "/root/autodl-tmp/ustc-qa-dpo-merged",
-                "/root/autodl-tmp/ustc-qa-merged",
-            ]:
-                if Path(default_path).exists():
-                    model_path = default_path
-                    break
-            if model_path is None:
-                print("[ERROR] 未指定模型路径，请使用 --merged-model 或 --base-model + --lora-adapter")
-                return
-
-    print(f"  评测模型: {model_path}")
-
     # 加载测试数据
     print("加载测试数据...")
     test_data_path = Path(args.test_data)
     if not test_data_path.exists():
-        # 回退到其他数据文件
         for fallback in ["data/preference_data.json", "data/qa_pairs.json"]:
             if Path(fallback).exists():
                 test_data_path = Path(fallback)
@@ -517,22 +538,75 @@ def main():
     num_samples = args.num_samples if args.num_samples > 0 else len(test_data)
     print(f"  测试数据: {len(test_data)} 条，评测: {min(num_samples, len(test_data))} 条")
 
-    if args.skip_base or not args.base_model:
-        # 只评测微调模型
-        llm, tokenizer = load_vllm_model(model_path)
-        summary, details = evaluate_model(
-            llm, tokenizer, test_data, num_samples, "finetuned"
+    # ========== 多模型对比模式 ==========
+    if args.models:
+        model_configs = []
+        for spec in args.models:
+            if ":" in spec:
+                label, path = spec.split(":", 1)
+            else:
+                label = Path(spec).name
+                path = spec
+            model_configs.append((label.strip(), path.strip()))
+
+        print(f"\n多模型对比评测: {len(model_configs)} 个模型")
+        for label, path in model_configs:
+            exists = "✓" if Path(path).exists() else "✗"
+            print(f"  [{exists}] {label}: {path}")
+
+        summaries, all_details = run_multi_comparison(
+            model_configs, test_data, num_samples
         )
-        summaries = {"lora_finetuned": summary}
-        all_details = {"lora_finetuned": details}
-        free_vllm(llm)
-        print_single_summary(summary)
+        print_multi_comparison(summaries)
+
+    # ========== 单模型 / 双模型对比模式 ==========
     else:
-        # 对比评测
-        summaries, all_details = run_comparison(
-            model_path, args.base_model, test_data, num_samples
-        )
-        print_comparison(summaries)
+        model_path = args.merged_model
+        temp_merged_dir = None
+
+        if model_path is None:
+            if args.base_model and args.lora_adapter:
+                temp_merged_dir = merge_lora_to_temp(args.base_model, args.lora_adapter)
+                model_path = temp_merged_dir
+            elif args.base_model:
+                model_path = args.base_model
+            else:
+                for default_path in [
+                    "/root/autodl-tmp/ustc-qa-dpo-merged",
+                    "/root/autodl-tmp/ustc-qa-merged",
+                ]:
+                    if Path(default_path).exists():
+                        model_path = default_path
+                        break
+                if model_path is None:
+                    print("[ERROR] 未指定模型路径，请使用 --merged-model 或 --models")
+                    return
+
+        print(f"  评测模型: {model_path}")
+
+        if args.skip_base or not args.base_model:
+            llm, tokenizer = load_vllm_model(model_path)
+            summary, details = evaluate_model(
+                llm, tokenizer, test_data, num_samples, "finetuned"
+            )
+            summaries = {"finetuned": summary}
+            all_details = {"finetuned": details}
+            free_vllm(llm)
+            print_single_summary(summary)
+        else:
+            model_configs = [
+                ("base", args.base_model),
+                ("finetuned", model_path),
+            ]
+            summaries, all_details = run_multi_comparison(
+                model_configs, test_data, num_samples
+            )
+            print_multi_comparison(summaries)
+
+        if temp_merged_dir:
+            import shutil
+            shutil.rmtree(temp_merged_dir, ignore_errors=True)
+            print(f"  已清理临时目录: {temp_merged_dir}")
 
     # 保存报告
     output_path = Path(args.output)
@@ -540,8 +614,7 @@ def main():
 
     report = {
         "config": {
-            "model": model_path,
-            "base_model": args.base_model,
+            "models": args.models or [args.merged_model],
             "test_data": str(test_data_path),
             "num_samples": num_samples,
         },
@@ -553,12 +626,6 @@ def main():
         json.dump(report, f, ensure_ascii=False, indent=2)
 
     print(f"\n评测报告已保存至: {output_path}")
-
-    # 清理临时目录
-    if temp_merged_dir:
-        import shutil
-        shutil.rmtree(temp_merged_dir, ignore_errors=True)
-        print(f"  已清理临时目录: {temp_merged_dir}")
 
 
 if __name__ == "__main__":

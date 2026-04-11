@@ -735,6 +735,8 @@ def main():
 
         epoch_metrics = {"loss": 0, "policy_loss": 0, "kl_divergence": 0}
         step_count = 0
+        epoch_best_reward = float("-inf")
+        epoch_best_step = -1
 
         for step in range(num_steps):
             batch_start = step * num_samples_per_step
@@ -780,15 +782,13 @@ def main():
                     f"kl={metrics['kl_divergence']:.4f} | "
                     f"reward={mean_reward:.3f}")
 
-            # 保存最优 checkpoint（reward 最高 + KL 合理）
-            if mean_reward > best_reward and metrics["kl_divergence"] < 5.0:
-                best_reward = mean_reward
-                best_step = step + 1
-                best_path = output_dir / f"best-epoch{epoch+1}"
-                policy_model.save_pretrained(str(best_path))
-                tokenizer.save_pretrained(str(best_path))
-                log(f"  ★ 最优模型更新: step={best_step}, reward={best_reward:.3f}, "
-                    f"kl={metrics['kl_divergence']:.4f}")
+            # 追踪本轮和全局最优 reward（仅记录，不保存 checkpoint）
+            if mean_reward > epoch_best_reward and metrics["kl_divergence"] < 5.0:
+                epoch_best_reward = mean_reward
+                epoch_best_step = step + 1
+                if mean_reward > best_reward:
+                    best_reward = mean_reward
+                    best_step = epoch_best_step
 
             # 定期保存 checkpoint（仅在 save_steps > 0 时）
             if args.save_steps > 0 and (step + 1) % args.save_steps == 0:
@@ -814,11 +814,6 @@ def main():
         log("\n[Phase 4] 合并 LoRA 权重...")
         merged_output = Path(args.merged_output)
         epoch_merged_path = str(merged_output / f"epoch-{epoch+1}")
-
-        # 保存 best LoRA adapter 到系统盘（很小，~0.3GB）
-        best_lora_path = output_dir / f"best-epoch{epoch+1}"
-        if best_step > 0 and best_lora_path.exists():
-            log(f"  最优 LoRA adapter 已保存: {best_lora_path} (step={best_step}, reward={best_reward:.3f})")
 
         # 合并完整模型到数据盘
         merge_and_save_lora(policy_model, tokenizer, epoch_merged_path)
@@ -874,7 +869,7 @@ def main():
         gpu_info.append({
             "index": i,
             "name": props.name,
-            "total_memory_gb": round(props.total_mem / 1024**3, 1),
+            "total_memory_gb": round(props.total_memory / 1024**3, 1),
         })
 
     # 计算训练曲线统计
