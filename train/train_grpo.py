@@ -780,7 +780,7 @@ def main():
                 clip_epsilon=args.clip_epsilon,
                 kl_coef=args.kl_coef,
                 max_length=args.max_length,
-                micro_batch_size=16,
+                micro_batch_size=8,
             )
 
             step_count += 1
