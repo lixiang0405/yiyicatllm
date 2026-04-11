@@ -375,16 +375,21 @@ def _eval_single_model_subprocess(label, model_path, test_data_path, num_samples
     import subprocess
     import sys
 
+    eval_script = str(Path(__file__).resolve())
+
     script = f"""
-import json, sys
-sys.path.insert(0, '.')
-from train.evaluate_model import load_vllm_model, evaluate_model
+import json, sys, importlib.util
+
+# 动态导入 evaluate_model.py
+spec = importlib.util.spec_from_file_location("evaluate_model", "{eval_script}")
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
 
 with open("{test_data_path}", "r", encoding="utf-8") as f:
     test_data = json.load(f)
 
-llm, tokenizer = load_vllm_model("{model_path}")
-summary, details = evaluate_model(llm, tokenizer, test_data, {num_samples}, "{label}")
+llm, tokenizer = mod.load_vllm_model("{model_path}")
+summary, details = mod.evaluate_model(llm, tokenizer, test_data, {num_samples}, "{label}")
 
 result = {{"summary": summary, "details": details[:10]}}
 with open("{result_file}", "w", encoding="utf-8") as f:
@@ -394,7 +399,6 @@ print("  评测完成，结果已保存")
 """
     proc = subprocess.run(
         [sys.executable, "-c", script],
-        cwd=str(Path(__file__).resolve().parent.parent),
         capture_output=False,
     )
     return proc.returncode
