@@ -232,7 +232,7 @@ python3 train/split_data.py \
 echo "  合并 SFT 训练数据..."
 python3 train/merge_sft_data.py \
     --new-qa data/new_qa.json \
-    --pref-data data/preference_data.json \
+    --pref-data data/dpo_train_data.json \
     --output data/sft_train_data.json
 
 SFT_DATA="data/sft_train_data.json"

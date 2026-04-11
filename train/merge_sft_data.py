@@ -15,8 +15,8 @@ def main():
     parser = argparse.ArgumentParser(description="合并 SFT 训练数据")
     parser.add_argument("--new-qa", type=str, default="data/new_qa.json",
                         help="new_qa 数据路径")
-    parser.add_argument("--pref-data", type=str, default="data/preference_data.json",
-                        help="偏好数据路径")
+    parser.add_argument("--pref-data", type=str, default="data/dpo_train_data.json",
+                        help="偏好训练数据路径（已去掉验证集）")
     parser.add_argument("--output", type=str, default="data/sft_train_data.json",
                         help="合并后的 SFT 训练数据输出路径")
     args = parser.parse_args()
