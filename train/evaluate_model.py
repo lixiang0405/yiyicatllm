@@ -302,7 +302,8 @@ def evaluate_model(
     samples = random.sample(test_data, min(num_samples, len(test_data)))
 
     questions = [item["instruction"] for item in samples]
-    references = [item["output"] for item in samples]
+    # 兼容不同数据格式：qa_pairs 用 "output"，preference_data/eval_data 用 "chosen"
+    references = [item.get("output") or item.get("chosen", "") for item in samples]
 
     print(f"\n  评测 [{model_label}] 模型，共 {len(samples)} 条测试数据...")
     print(f"  使用 vLLM 批量推理...")
