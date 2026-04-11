@@ -382,6 +382,9 @@ def compute_log_probs_batched(
             with torch.no_grad():
                 logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
 
+        # device_map="auto" 时 logits 可能在不同设备上，统一搬到 input_ids 所在设备
+        if logits.device != input_ids.device:
+            logits = logits.to(input_ids.device)
         mb_log_probs = _extract_response_log_probs(
             logits, input_ids, mb_ids, mb_starts, max_len
         )
@@ -665,8 +668,9 @@ def main():
                 all_advantages.append(advantage)
                 all_flat_rewards_list.append(reward_val)
 
-        device = torch.device("cuda:0")
-        advantages_tensor = torch.stack(all_advantages).to(device)
+        # 使用 cuda:0 作为 tensor 存放设备（device_map="auto" 的模型会自动处理输入搬运）
+        tensor_device = torch.device("cuda:0")
+        advantages_tensor = torch.stack(all_advantages).to(tensor_device)
         log(f"  展平后: {len(all_flat_prompts)} 条 (prompt, response) 对")
 
         # ========================================
@@ -679,15 +683,20 @@ def main():
             current_model_path,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
+            device_map="auto",
             local_files_only=True,
-        ).to(device)
+        )
         ref_model.eval()
-        log(f"  参考模型加载完成 (单卡 {device}): {get_gpu_memory_info()}")
+        # device_map="auto" 时模型分布在多卡上，用第一个参数的 device 作为输出 device
+        ref_device = next(ref_model.parameters()).device
+        log(f"  参考模型加载完成 (device_map=auto): {get_gpu_memory_info()}")
 
         ref_log_probs = compute_log_probs_batched(
             ref_model, tokenizer, all_flat_prompts, all_flat_responses,
-            device, args.max_length, micro_batch_size=64, requires_grad=False,
+            ref_device, args.max_length, micro_batch_size=128, requires_grad=False,
         )
+        # 确保 ref_log_probs 在 tensor_device 上，与 advantages_tensor 一致
+        ref_log_probs = ref_log_probs.to(tensor_device)
         log(f"  ref log_prob 计算完成: shape={ref_log_probs.shape}")
 
         # 释放 ref_model，腾出显存给 policy_model
@@ -759,11 +768,11 @@ def main():
                 flat_responses=all_flat_responses[batch_start:batch_end],
                 advantages=advantages_tensor[batch_start:batch_end],
                 ref_log_probs=ref_log_probs[batch_start:batch_end],
-                device=device,
+                device=tensor_device,
                 clip_epsilon=args.clip_epsilon,
                 kl_coef=args.kl_coef,
                 max_length=args.max_length,
-                micro_batch_size=8,
+                micro_batch_size=16,
             )
 
             step_count += 1

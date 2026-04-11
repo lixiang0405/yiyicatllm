@@ -34,8 +34,8 @@ per_device_eval_batch_size: 4
 eval_strategy: steps
 
 ### 训练超参数
-per_device_train_batch_size: 8
-gradient_accumulation_steps: 2
+per_device_train_batch_size: 16
+gradient_accumulation_steps: 1
 learning_rate: 2.0e-4
 num_train_epochs: 6
 lr_scheduler_type: cosine
