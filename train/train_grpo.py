@@ -533,8 +533,12 @@ def main():
                         help="最大生成长度")
     parser.add_argument("--temperature", type=float, default=0.7,
                         help="采样温度")
+    parser.add_argument("--max-steps", type=int, default=0,
+                        help="每轮最大训练步数 (0=不限制，跑完所有数据)")
     parser.add_argument("--save-steps", type=int, default=50,
-                        help="每多少步保存一次 checkpoint")
+                        help="每多少步保存一次 checkpoint (0=不保存中间 checkpoint)")
+    parser.add_argument("--merged-output", type=str, default="/root/autodl-tmp/ustc-qa-grpo-merged",
+                        help="合并模型保存路径 (建议放数据盘)")
     parser.add_argument("--skip-generate", action="store_true",
                         help="跳过推理，复用上次缓存的生成数据")
     args = parser.parse_args()
@@ -544,10 +548,12 @@ def main():
     print("=" * 60)
     print(f"  模型: {args.model}")
     print(f"  数据: {args.data}")
-    print(f"  输出: {args.output}")
+    print(f"  输出 (LoRA/日志): {args.output}")
+    print(f"  合并模型输出: {args.merged_output}")
     print(f"  GPU: {torch.cuda.device_count()} × {torch.cuda.get_device_name(0)}")
     print(f"  每 prompt 采样: {args.num_samples}")
     print(f"  训练 batch: {args.batch_size}")
+    print(f"  每轮最大步数: {args.max_steps if args.max_steps > 0 else '不限制'}")
     print(f"  LoRA: rank={args.lora_rank}, alpha={args.lora_alpha}")
     print(f"  学习率: {args.lr}")
     print(f"  PPO clip: {args.clip_epsilon}")
@@ -722,6 +728,9 @@ def main():
         if num_steps == 0:
             num_steps = 1
             num_samples_per_step = len(all_flat_prompts)
+        # 限制每轮最大步数
+        if args.max_steps > 0 and num_steps > args.max_steps:
+            num_steps = args.max_steps
         log(f"  总步数: {num_steps} (每步 {num_samples_per_step} 条)")
 
         epoch_metrics = {"loss": 0, "policy_loss": 0, "kl_divergence": 0}
@@ -781,8 +790,8 @@ def main():
                 log(f"  ★ 最优模型更新: step={best_step}, reward={best_reward:.3f}, "
                     f"kl={metrics['kl_divergence']:.4f}")
 
-            # 定期保存 checkpoint
-            if (step + 1) % args.save_steps == 0:
+            # 定期保存 checkpoint（仅在 save_steps > 0 时）
+            if args.save_steps > 0 and (step + 1) % args.save_steps == 0:
                 ckpt_path = output_dir / f"checkpoint-epoch{epoch+1}-step{step+1}"
                 policy_model.save_pretrained(str(ckpt_path))
                 tokenizer.save_pretrained(str(ckpt_path))
@@ -800,42 +809,56 @@ def main():
         log(f"    mean_reward={avg_reward:.3f}")
 
         # ========================================
-        # Phase 4: 合并 LoRA 并保存
+        # Phase 4: 合并 LoRA 并保存到数据盘
         # ========================================
         log("\n[Phase 4] 合并 LoRA 权重...")
-        epoch_output = str(output_dir / f"epoch-{epoch+1}")
-        merge_and_save_lora(policy_model, tokenizer, epoch_output)
+        merged_output = Path(args.merged_output)
+        epoch_merged_path = str(merged_output / f"epoch-{epoch+1}")
+
+        # 保存 best LoRA adapter 到系统盘（很小，~0.3GB）
+        best_lora_path = output_dir / f"best-epoch{epoch+1}"
+        if best_step > 0 and best_lora_path.exists():
+            log(f"  最优 LoRA adapter 已保存: {best_lora_path} (step={best_step}, reward={best_reward:.3f})")
+
+        # 合并完整模型到数据盘
+        merge_and_save_lora(policy_model, tokenizer, epoch_merged_path)
 
         # 释放训练模型显存
         del policy_model, optimizer, ref_log_probs, advantages_tensor
         free_gpu_memory()
 
+        # 删除上一轮的旧合并模型（数据盘），节省空间
+        prev_model_path = Path(current_model_path)
+        if prev_model_path != Path(args.model) and prev_model_path.exists() and prev_model_path.is_dir():
+            import shutil
+            shutil.rmtree(str(prev_model_path))
+            log(f"  已删除上一轮模型: {prev_model_path}")
+
         # 更新模型路径，下一轮用合并后的模型
-        current_model_path = epoch_output
+        current_model_path = epoch_merged_path
         log(f"  下一轮将使用: {current_model_path}")
 
     # ========================================
     # 训练完成
     # ========================================
-    # 复制最终模型到输出根目录
-    final_model_path = str(output_dir / "final")
-    log(f"\n复制最终模型到: {final_model_path}")
     import shutil
-    if Path(current_model_path).exists():
-        shutil.copytree(current_model_path, final_model_path, dirs_exist_ok=True)
+    final_model_path = current_model_path  # 数据盘上的最终合并模型
 
-    # 清理中间 checkpoint，只保留 best 和 final
-    log("清理中间 checkpoint...")
+    # 复制最终合并模型到系统盘
+    final_local_path = str(output_dir / "final")
+    log(f"\n复制最终模型到系统盘: {final_local_path}")
+    if Path(final_model_path).exists():
+        shutil.copytree(final_model_path, final_local_path, dirs_exist_ok=True)
+        log("  复制完成")
+
+    # 清理系统盘上的中间 checkpoint
+    log("清理中间文件...")
     for ckpt_dir in output_dir.glob("checkpoint-*"):
         if ckpt_dir.is_dir():
             shutil.rmtree(str(ckpt_dir))
             log(f"  已删除: {ckpt_dir.name}")
-    # epoch 目录也可以删（final 已经是拷贝）
-    for epoch_dir in output_dir.glob("epoch-*"):
-        if epoch_dir.is_dir():
-            shutil.rmtree(str(epoch_dir))
-            log(f"  已删除: {epoch_dir.name}")
-    log("  保留: final/, best-epoch*/, train.log, generate_cache, 训练报告")
+    log(f"  系统盘保留: final/, best-epoch*/ (LoRA), train.log, generate_cache, 训练报告")
+    log(f"  数据盘模型: {final_model_path}")
 
     # ========================================
     # 生成训练报告
@@ -923,9 +946,10 @@ def main():
 
     print("\n" + "=" * 60)
     print("  GRPO 训练完成!")
-    print(f"  最终模型: {final_model_path}")
+    print(f"  最终合并模型 (数据盘): {final_model_path}")
     if best_step > 0:
-        print(f"  最优模型: {output_dir / f'best-epoch{args.epochs}'} (step={best_step}, reward={best_reward:.3f})")
+        print(f"  最优 LoRA (系统盘): {output_dir / f'best-epoch{args.epochs}'} "
+              f"(step={best_step}, reward={best_reward:.3f})")
     print(f"  训练报告: {report_path}")
     print(f"  训练日志: {output_dir / 'train.log'}")
     print("=" * 60)

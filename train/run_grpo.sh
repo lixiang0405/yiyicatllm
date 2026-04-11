@@ -75,13 +75,17 @@ sleep 2
 unset PYTORCH_CUDA_ALLOC_CONF 2>/dev/null || true
 
 # --- 启动训练 ---
+MERGED_OUTPUT="/root/autodl-tmp/ustc-qa-grpo-merged"
+
 python3 "${PROJECT_DIR}/train/train_grpo.py" \
     --model "${DPO_MODEL_PATH}" \
     --data "${GRPO_DATA}" \
     --output "${OUTPUT_DIR}" \
+    --merged-output "${MERGED_OUTPUT}" \
     --num-samples 4 \
     --batch-size 16 \
-    --epochs 1 \
+    --epochs 3 \
+    --max-steps 50 \
     --lr 5e-6 \
     --lora-rank 32 \
     --lora-alpha 64 \
@@ -90,15 +94,17 @@ python3 "${PROJECT_DIR}/train/train_grpo.py" \
     --max-length 512 \
     --max-new-tokens 256 \
     --temperature 0.7 \
-    --save-steps 50 \
+    --save-steps 0 \
     "$@"
 
 echo ""
 echo "=========================================="
 echo "  GRPO 训练完成!"
-echo "  模型保存至: ${OUTPUT_DIR}/final"
+echo "  合并模型 (数据盘): ${MERGED_OUTPUT}"
+echo "  最优 LoRA (系统盘): ${OUTPUT_DIR}/best-epoch*"
+echo "  训练报告: report/grpo_report/grpo_train_report.json"
 echo ""
 echo "  下一步:"
-echo "    1. 评测模型: python train/evaluate_model.py"
+echo "    1. 评测模型: python train/evaluate_model.py --merged-model ${MERGED_OUTPUT}/epoch-3"
 echo "    2. 量化部署: python quantize/quantize_model.py"
 echo "=========================================="
