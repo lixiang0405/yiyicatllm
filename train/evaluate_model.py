@@ -370,18 +370,50 @@ def free_vllm(llm):
     torch.cuda.empty_cache()
 
 
-def run_multi_comparison(model_configs, test_data, num_samples):
-    """多模型对比评测
+def _eval_single_model_subprocess(label, model_path, test_data_path, num_samples, result_file):
+    """在子进程中评测单个模型，结果写入临时文件"""
+    import subprocess
+    import sys
+
+    script = f"""
+import json, sys
+sys.path.insert(0, '.')
+from train.evaluate_model import load_vllm_model, evaluate_model
+
+with open("{test_data_path}", "r", encoding="utf-8") as f:
+    test_data = json.load(f)
+
+llm, tokenizer = load_vllm_model("{model_path}")
+summary, details = evaluate_model(llm, tokenizer, test_data, {num_samples}, "{label}")
+
+result = {{"summary": summary, "details": details[:10]}}
+with open("{result_file}", "w", encoding="utf-8") as f:
+    json.dump(result, f, ensure_ascii=False, indent=2)
+
+print("  评测完成，结果已保存")
+"""
+    proc = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=str(Path(__file__).resolve().parent.parent),
+        capture_output=False,
+    )
+    return proc.returncode
+
+def run_multi_comparison(model_configs, test_data, num_samples, test_data_path=None):
+    """多模型对比评测（每个模型在独立子进程中运行，避免 vLLM 显存残留）
 
     Args:
         model_configs: [(label, path), ...] 模型标签和路径列表
-        test_data: 测试数据
+        test_data: 测试数据（仅用于非子进程模式）
         num_samples: 评测样本数
+        test_data_path: 测试数据文件路径（子进程模式需要）
 
     Returns:
         all_summaries: {label: summary}
         all_details: {label: details}
     """
+    import tempfile
+
     all_summaries = {}
     all_details = {}
     total = len(model_configs)
@@ -391,15 +423,28 @@ def run_multi_comparison(model_configs, test_data, num_samples):
             print(f"\n[{idx}/{total}] 跳过 [{label}]（路径不存在: {model_path}）")
             continue
 
-        print(f"\n[{idx}/{total}] 加载 [{label}] 模型: {model_path}")
-        llm, tokenizer = load_vllm_model(model_path)
-        summary, details = evaluate_model(
-            llm, tokenizer, test_data, num_samples, label
+        print(f"\n[{idx}/{total}] 评测 [{label}]: {model_path}")
+
+        # 使用临时文件传递结果
+        result_file = tempfile.mktemp(suffix=".json", prefix=f"eval_{label}_")
+
+        returncode = _eval_single_model_subprocess(
+            label, model_path, test_data_path, num_samples, result_file
         )
-        all_summaries[label] = summary
-        all_details[label] = details
-        free_vllm(llm)
-        print(f"  [{label}] 评测完成")
+
+        if returncode != 0:
+            print(f"  [ERROR] [{label}] 评测失败 (exit code={returncode})")
+            continue
+
+        if Path(result_file).exists():
+            with open(result_file, "r", encoding="utf-8") as f:
+                result = json.load(f)
+            all_summaries[label] = result["summary"]
+            all_details[label] = result["details"]
+            Path(result_file).unlink()
+            print(f"  [{label}] 评测完成 ✓")
+        else:
+            print(f"  [ERROR] [{label}] 结果文件未生成")
 
     return all_summaries, all_details
 
@@ -565,7 +610,7 @@ def main():
             print(f"  [{exists}] {label}: {path}")
 
         summaries, all_details = run_multi_comparison(
-            model_configs, test_data, num_samples
+            model_configs, test_data, num_samples, test_data_path=str(test_data_path)
         )
         print_multi_comparison(summaries)
 
