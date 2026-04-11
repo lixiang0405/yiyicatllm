@@ -90,7 +90,8 @@ python3 "${PROJECT_DIR}/train/train_grpo.py" \
     --max-length 512 \
     --max-new-tokens 256 \
     --temperature 0.7 \
-    --save-steps 50
+    --save-steps 50 \
+    "$@"
 
 echo ""
 echo "=========================================="
