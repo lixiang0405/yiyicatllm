@@ -654,7 +654,7 @@ def main():
                 ("finetuned", model_path),
             ]
             summaries, all_details = run_multi_comparison(
-                model_configs, test_data, num_samples
+                model_configs, test_data, num_samples, test_data_path=str(test_data_path)
             )
             print_multi_comparison(summaries)
 
