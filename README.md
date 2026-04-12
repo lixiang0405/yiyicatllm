@@ -1,13 +1,13 @@
 # 🎓 中科大智能问答助手 (USTC-QA)
 
-基于 **Qwen2.5-7B + LoRA 微调 + DeepSpeed 分布式训练 + AWQ 量化 + vLLM 部署** 的 LLM 全链路训推项目。
+基于 **Qwen2.5-7B + LoRA 微调 + DeepSpeed 分布式训练 + GGUF 量化 + llama.cpp 部署** 的 LLM 全链路训推项目。
 
 ## 项目概述
 
 本项目展示了大语言模型从数据工程、分布式训练、模型量化到推理部署的**完整生产链路**：
 
 ```
-数据爬取/生成 → LoRA 微调(DeepSpeed) → 权重合并 → INT4 量化 → vLLM 本地部署 → Web 交互
+数据爬取/生成 → SFT 微调(DeepSpeed) → DPO 对齐 → GRPO 强化学习 → 权重合并 → GGUF 量化 → llama.cpp 本地部署
 ```
 
 ### 技术栈
@@ -17,10 +17,11 @@
 | 基座模型 | Qwen2.5-7B |
 | 微调方法 | LoRA (PEFT) |
 | 训练框架 | LLaMA-Factory + DeepSpeed ZeRO-2 |
-| 分布式训练 | 多卡 3090/4090 + DeepSpeed |
-| 模型量化 | AWQ / GPTQ (INT4) |
-| 推理引擎 | vLLM (PagedAttention) |
-| 前端界面 | Gradio |
+| 分布式训练 | 2 × RTX 5090 + DeepSpeed |
+| 偏好对齐 | DPO (Direct Preference Optimization) |
+| 强化学习 | veRL GRPO (规则奖励函数) |
+| 模型量化 | GGUF Q8_0 (llama.cpp) |
+| 推理部署 | llama.cpp (OpenAI 兼容 API) |
 
 ### 项目结构
 
@@ -45,9 +46,9 @@ yiyicat-llm/
 │   ├── prepare_grpo_data.py        # GRPO 数据准备
 │   └── merge_lora.py               # LoRA 权重合并
 ├── quantize/
-│   └── quantize_model.py           # 模型量化 (GPTQ/AWQ)
+│   └── quantize_model.py           # 模型量化 (GPTQ/GGUF)
 ├── deploy/
-│   ├── serve.sh                    # vLLM 推理服务启动
+│   ├── serve.sh                    # llama.cpp 推理服务启动
 │   └── chat_demo.py                # Gradio 聊天界面
 └── benchmark/
     └── benchmark.py                # 推理性能测试
@@ -63,7 +64,7 @@ yiyicat-llm/
 | Python | 3.11 |
 | CUDA | 12.8 |
 | PyTorch | 2.10.0+cu128 |
-| GPU (训练) | 3090 × 4 / 4090 × 2 / A100 (租卡) |
+| GPU (训练) | RTX 5090 × 2 |
 | GPU (推理) | RTX 5070 Laptop 8GB |
 
 ---
@@ -135,7 +136,7 @@ python data/generate_qa.py --model gpt-4o-mini --num-pairs 10
 bash train/run_train.sh
 ```
 
-#### 多卡分布式训练（推荐，租 4×3090）
+#### 多卡分布式训练（推荐，2 × 5090）
 
 ```bash
 # 训练脚本会自动检测 GPU 数量并启用 DeepSpeed ZeRO-2
@@ -146,8 +147,8 @@ bash train/run_train.sh
 
 | 参数 | 值 | 说明 |
 |------|-----|------|
-| lora_rank | 16 | LoRA 秩，越大参数越多 |
-| lora_alpha | 32 | LoRA 缩放系数 |
+| lora_rank | 64 | LoRA 秩，越大参数越多 |
+| lora_alpha | 128 | LoRA 缩放系数 |
 | learning_rate | 2e-4 | 学习率 |
 | num_train_epochs | 3 | 训练轮数 |
 | per_device_train_batch_size | 2 | 每卡 batch size |
@@ -254,25 +255,34 @@ python train/merge_lora.py \
 
 ### Step 6: 模型量化
 
-将 FP16 模型量化为 INT4，从 ~14GB 压缩到 ~4.5GB，适配 8GB 显存。
+将合并后的模型转换为 GGUF Q8_0 格式（~7.5GB），适配 8GB 显存笔记本部署。
 
 ```bash
-# AWQ 量化（推荐，速度更快）
+# GGUF Q8_0 量化（推荐，精度损失极小）
 python quantize/quantize_model.py \
     --model-path outputs/ustc-qa-merged \
-    --method awq --bits 4
+    --method gguf --bits 8
 
-# 或 GPTQ 量化
+# 或 GPTQ INT4 量化（体积更小，~4.5GB）
 python quantize/quantize_model.py \
     --model-path outputs/ustc-qa-merged \
     --method gptq --bits 4
 ```
 
-### Step 7: vLLM 本地部署
+### Step 7: llama.cpp 本地部署
+
+使用 llama.cpp 在本地笔记本（RTX 5070 Laptop 8GB）上部署 GGUF 模型，提供 OpenAI 兼容 API。
 
 ```bash
-# 启动推理服务（自动检测量化方式）
-bash deploy/serve.sh outputs/ustc-qa-quantized-awq-int4
+# 安装 llama.cpp（macOS / Linux）
+brew install llama.cpp
+# 或从源码编译: https://github.com/ggerganov/llama.cpp
+
+# 启动推理服务（OpenAI 兼容 API）
+llama-server \
+    -m outputs/ustc-qa-merged-gguf-q8_0/ustc-qa-Q8_0.gguf \
+    --host 0.0.0.0 --port 8000 \
+    -ngl 99 -c 4096
 
 # 服务启动后，API 地址: http://localhost:8000/v1
 ```
@@ -282,16 +292,16 @@ bash deploy/serve.sh outputs/ustc-qa-quantized-awq-int4
 curl http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "outputs/ustc-qa-quantized-awq-int4",
+    "model": "ustc-qa",
     "messages": [{"role": "user", "content": "中科大少年班是什么？"}],
-    "max_tokens": 256
+    "max_tokens": 512
   }'
 ```
 
 ### Step 8: Web 聊天界面
 
 ```bash
-# 启动 Gradio 界面（需要先启动 vLLM 服务）
+# 启动 Gradio 界面（需要先启动 llama.cpp 服务）
 python deploy/chat_demo.py --port 7860
 
 # 浏览器访问: http://localhost:7860
@@ -300,7 +310,7 @@ python deploy/chat_demo.py --port 7860
 ### Step 9: 性能 Benchmark
 
 ```bash
-# 运行性能测试（需要先启动 vLLM 服务）
+# 运行性能测试（需要先启动 llama.cpp 服务）
 python benchmark/benchmark.py --concurrency 4 --num-requests 10
 
 # 结果保存至 benchmark/results.json
@@ -341,15 +351,15 @@ python benchmark/benchmark.py --concurrency 4 --num-requests 10
 │  └──────────────────────┬───────────────────────────┘          │
 │                         │                                       │
 │                         ▼                                       │
-│  ┌──────────────┐    ┌──────────────┐                          │
-│  │ LoRA 权重合并 │───→│ AWQ INT4 量化 │                          │
-│  └──────────────┘    └──────┬───────┘                          │
+│  ┌──────────────┐    ┌───────────────┐                         │
+│  │ LoRA 权重合并 │───→│ GGUF Q8_0 量化 │                         │
+│  └──────────────┘    └──────┬────────┘                         │
 │                             │                                   │
 │                             ▼                                   │
 │  ┌──────────────────────────────────────────────────┐          │
-│  │              vLLM 推理服务                        │          │
-│  │  PagedAttention + Continuous Batching            │          │
-│  │  + Prefix Caching                                │          │
+│  │           llama.cpp 推理服务                      │          │
+│  │  GGUF 格式 + OpenAI 兼容 API                     │          │
+│  │  GPU 加速 (ngl 99) + 4K Context                  │          │
 │  └──────────────────────┬───────────────────────────┘          │
 │                         │                                       │
 │              ┌──────────┼──────────┐                           │
@@ -412,10 +422,10 @@ ZeRO（Zero Redundancy Optimizer）通过分片优化器状态和梯度来降低
 ### 数据优化
 - [ ] **RAG 增强**: 结合向量数据库实现检索增强生成
 - [ ] **数据增强**: 更多数据源、更多 QA 对
-- [ ] **DPO/RLHF**: 基于人类偏好的对齐训练
+- [x] **DPO + GRPO**: 偏好对齐 + 规则奖励强化学习（已完成）
 
 ### 工程优化
-- [ ] **量化对比**: GPTQ vs AWQ vs FP8 的精度/速度/显存对比
+- [ ] **量化对比**: GPTQ vs GGUF Q8_0 vs GGUF Q4_K_M 的精度/速度/显存对比
 - [ ] **完整 Benchmark**: TTFT、吞吐量、并发性能的详细报告
 - [ ] **Docker 部署**: 容器化部署方案
 
@@ -430,8 +440,8 @@ ZeRO（Zero Redundancy Optimizer）通过分片优化器状态和梯度来降低
 | **数据工程** | 爬虫、数据清洗、GPT 生成 QA 对、Alpaca 格式 |
 | **分布式训练** | DeepSpeed ZeRO-2、多卡并行、梯度累积、混合精度 |
 | **参数高效微调** | LoRA 原理、rank/alpha 调参、权重合并 |
-| **模型量化** | GPTQ/AWQ 原理、INT4 量化、精度-速度权衡 |
-| **推理优化** | PagedAttention、Continuous Batching、Prefix Caching |
+| **模型量化** | GPTQ/GGUF 原理、INT4/Q8_0 量化、精度-体积权衡 |
+| **推理部署** | llama.cpp、GGUF 格式、OpenAI 兼容 API |
 | **性能分析** | TTFT、吞吐量、加速比、瓶颈分析 |
 
 ---
