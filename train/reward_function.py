@@ -43,13 +43,13 @@ def _score_single(prompt: str, response: str) -> float:
     """对单个回答计算综合奖励分数"""
     score = 0.0
 
-    # 1. 长度奖励 (max 2.0)
+    # 1. 长度奖励 (max 2.0, min -5.0) — 权重最高，强力约束长度
     score += _length_reward(response)
 
     # 2. 格式奖励 (max 2.0)
     score += _format_reward(response)
 
-    # 3. 关键词奖励 (max 2.0)
+    # 3. 关键词奖励 (max 1.5) — 降低权重，防止堆砌关键词
     score += _keyword_reward(prompt, response)
 
     # 4. 流畅度惩罚 (max -3.0)
@@ -58,35 +58,40 @@ def _score_single(prompt: str, response: str) -> float:
     # 5. 完整性奖励 (max 1.0)
     score += _completeness_reward(response)
 
+    # 6. 信息密度奖励 (max 1.0) — 鼓励简洁有效的回答
+    score += _information_density_reward(response)
+
     return score
 
 
 def _length_reward(response: str) -> float:
     """
-    长度奖励: 鼓励 100-300 字的回答 (与 SFT 训练数据一致)
+    长度奖励: 强力鼓励 100-300 字的回答，严厉惩罚超长回答
     太短 (<50): 信息不足
     适中 (100-300): 最佳
-    稍长 (300-500): 轻微惩罚
-    太长 (>500): 明显惩罚，越长惩罚越重
+    稍长 (300-500): 惩罚
+    太长 (>500): 重度惩罚，越长惩罚越重
     """
     length = len(response)
 
     if length < 30:
-        return -1.0
+        return -2.0
     elif length < 50:
-        return 0.0
+        return -0.5
     elif length < 100:
         return 0.5
     elif length <= 300:
         return 2.0
+    elif length <= 400:
+        return 0.0
     elif length <= 500:
-        return 0.5
-    elif length <= 800:
-        return -1.0
+        return -1.5
+    elif length <= 600:
+        return -2.5
     else:
-        # 超过 800 字，每多 200 字多扣 0.5，最多扣到 -3.0
-        extra_penalty = min((length - 800) / 200 * 0.5, 2.0)
-        return -1.0 - extra_penalty
+        # 超过 600 字，每多 100 字多扣 0.5，最多扣到 -5.0
+        extra_penalty = min((length - 600) / 100 * 0.5, 2.5)
+        return -2.5 - extra_penalty
 
 
 def _format_reward(response: str) -> float:
@@ -183,11 +188,11 @@ def _keyword_reward(prompt: str, response: str) -> float:
         hit_rate = hit_count / len(prompt_entities)
         score += hit_rate * 1.0  # 最高 1.0
 
-    # 2. 核心词表：response 中出现的核心关键词
+    # 2. 核心词表：response 中出现的核心关键词（降低权重，防止堆砌）
     core_hits = sum(1 for kw in _CORE_KEYWORDS if kw in response)
-    score += min(core_hits * 0.2, 1.0)  # 最高 1.0
+    score += min(core_hits * 0.15, 0.5)  # 最高 0.5（从 1.0 降低）
 
-    return min(score, 2.0)
+    return min(score, 1.5)
 
 
 def _fluency_penalty(response: str) -> float:
@@ -239,6 +244,42 @@ def _completeness_reward(response: str) -> float:
         return 0.5
     else:
         return 0.0
+
+
+def _information_density_reward(response: str) -> float:
+    """
+    信息密度奖励: 鼓励简洁有效的回答，惩罚注水和废话
+    - 高密度: 短回答中包含较多实体/数字/专有名词
+    - 低密度: 长回答中大量重复表述或空洞内容
+    """
+    length = len(response)
+    if length < 30:
+        return 0.0
+
+    # 统计有效信息元素
+    info_elements = set()
+    # 数字事实
+    info_elements.update(re.findall(r'\d+(?:年|月|天|人|分|元|%|门|学分|个|条)', response))
+    # 英文术语
+    info_elements.update(
+        term for term in re.findall(r'[A-Za-z][A-Za-z0-9_.+-]{2,}', response)
+        if term.lower() not in {"the", "and", "for", "with", "from", "that", "this", "are", "was", "not", "can", "will"}
+    )
+    # 中文专有名词（书名号/引号内）
+    info_elements.update(q for q in re.findall(r'[《「](.*?)[》」]', response) if 2 <= len(q) <= 15)
+    # 机构名
+    info_elements.update(re.findall(r'[\u4e00-\u9fff]{2,8}(?:大学|学院|公司|实验室|研究院|中心)', response))
+
+    density = len(info_elements) / (length / 100)  # 每 100 字的信息元素数
+
+    if density >= 3.0:
+        return 1.0
+    elif density >= 2.0:
+        return 0.5
+    elif density >= 1.0:
+        return 0.0
+    else:
+        return -0.5
 
 
 # veRL 要求的入口函数
@@ -295,3 +336,4 @@ if __name__ == '__main__':
         print(f'      关键词: {_keyword_reward(case["prompt"], case["response"]):.1f}')
         print(f'      流畅度: {_fluency_penalty(case["response"]):.1f}')
         print(f'      完整性: {_completeness_reward(case["response"]):.1f}')
+        print(f'      信息密度: {_information_density_reward(case["response"]):.1f}')

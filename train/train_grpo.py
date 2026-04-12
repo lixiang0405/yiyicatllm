@@ -877,13 +877,6 @@ def main():
         del policy_model, optimizer, ref_log_probs, advantages_tensor
         free_gpu_memory()
 
-        # 删除上一轮的旧合并模型（数据盘），节省空间
-        prev_model_path = Path(current_model_path)
-        if prev_model_path != Path(args.model) and prev_model_path.exists() and prev_model_path.is_dir():
-            import shutil
-            shutil.rmtree(str(prev_model_path))
-            log(f"  已删除上一轮模型: {prev_model_path}")
-
         # 更新模型路径，下一轮用合并后的模型
         current_model_path = epoch_merged_path
         log(f"  下一轮将使用: {current_model_path}")
