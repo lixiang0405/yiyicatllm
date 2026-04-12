@@ -6,25 +6,6 @@
 依赖：transformers, optimum, torch
 """
 
-# 绕过 torchvision CUDA 版本检查（量化语言模型不需要 torchvision）
-import importlib.util
-import sys
-import types
-
-if "torchvision" not in sys.modules:
-    _tv = types.ModuleType("torchvision")
-    _tv.__version__ = "0.25.0"
-    _tv.__spec__ = importlib.util.spec_from_loader("torchvision", loader=None)
-    _tvt = types.ModuleType("torchvision.transforms")
-    _tvt.__spec__ = importlib.util.spec_from_loader("torchvision.transforms", loader=None)
-    _tvt.InterpolationMode = type("InterpolationMode", (), {
-        "BILINEAR": 2, "BICUBIC": 3, "NEAREST": 0, "NEAREST_EXACT": 0,
-        "BOX": 4, "HAMMING": 5, "LANCZOS": 1,
-    })
-    _tv.transforms = _tvt
-    sys.modules["torchvision"] = _tv
-    sys.modules["torchvision.transforms"] = _tvt
-
 import argparse
 import json
 from pathlib import Path
