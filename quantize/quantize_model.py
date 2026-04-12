@@ -6,6 +6,17 @@
 依赖：transformers, optimum, torch
 """
 
+# 绕过 torchvision CUDA 版本检查：量化语言模型不需要 torchvision，
+# 但 transformers 的 import 链条会拖进来导致 CUDA 版本不匹配报错
+import sys
+import types
+if "torchvision" not in sys.modules:
+    fake_tv = types.ModuleType("torchvision")
+    fake_tv.transforms = types.ModuleType("torchvision.transforms")
+    fake_tv.transforms.InterpolationMode = type("InterpolationMode", (), {})
+    sys.modules["torchvision"] = fake_tv
+    sys.modules["torchvision.transforms"] = fake_tv.transforms
+
 import argparse
 import json
 from pathlib import Path
