@@ -20,6 +20,7 @@ from typing import List, Dict, Any
 def compute_reward(
     prompts: List[str],
     responses: List[str],
+    references: List[str] = None,
     **kwargs
 ) -> List[float]:
     """
@@ -28,73 +29,139 @@ def compute_reward(
     Args:
         prompts: 输入的 prompt 列表
         responses: 模型生成的 response 列表
+        references: 参考答案列表（可选，有则计算相似度奖励和相对长度比）
 
     Returns:
         rewards: 每个 response 的奖励分数列表
     """
     rewards = []
-    for prompt, response in zip(prompts, responses):
-        reward = _score_single(prompt, response)
+    if references is None:
+        references = [""] * len(prompts)
+    for prompt, response, reference in zip(prompts, responses, references):
+        reward = _score_single(prompt, response, reference)
         rewards.append(reward)
     return rewards
 
 
-def _score_single(prompt: str, response: str) -> float:
+def _score_single(prompt: str, response: str, reference: str = "") -> float:
     """
     对单个回答计算综合奖励分数
 
     采用乘法结构：总分 = 内容分 × 长度系数
-    这样长度异常时无论内容多好，总分都会被压低，防止 reward hacking
+    长度系数优先使用相对长度比（相对于参考答案），无参考答案时用绝对长度
     """
     # Step 1: 计算内容质量分（加法，各维度独立）
     content_score = 0.0
-    content_score += _format_reward(response)           # max 2.0
-    content_score += _keyword_reward(prompt, response)  # max 1.5
-    content_score += _completeness_reward(response)     # max 1.0
-    content_score += _information_density_reward(response)  # max 1.0
-    content_score += _fluency_penalty(response)         # max 0, min -3.0
-    # content_score 范围: [-3.0, 5.5]
+    content_score += _format_reward(response)                       # max 2.0
+    content_score += _keyword_reward(prompt, response, reference)   # max 1.5
+    content_score += _completeness_reward(response)                 # max 1.0
+    content_score += _information_density_reward(response)          # max 1.0
+    content_score += _fluency_penalty(response)                     # max 0, min -3.0
 
-    # 归一化到 [0, 1] 区间，方便乘法
-    normalized_content = max(0.0, (content_score + 3.0) / 8.5)  # -3→0, 5.5→1.0
+    # 有参考答案时，加入相似度奖励和事实命中率奖励
+    if reference:
+        content_score += _similarity_reward(reference, response)    # max 3.0
+        content_score += _fact_hit_reward(reference, response)      # max 1.5
+    # content_score 范围: [-3.0, 10.0]（有参考答案时）
+    # 归一化到 [0, 1] 区间
+    max_content = 10.0 if reference else 5.5
+    normalized_content = max(0.0, (content_score + 3.0) / (max_content + 3.0))
 
     # Step 2: 计算长度系数（乘法，直接缩放总分）
-    length_multiplier = _length_multiplier(response)  # [0.0, 1.0]
+    if reference:
+        length_multiplier = _relative_length_multiplier(reference, response)
+    else:
+        length_multiplier = _length_multiplier(response)
 
-    # Step 3: 总分 = 基础分 + 内容分 × 长度系数 × 缩放
-    # 最佳情况: 0 + 1.0 × 1.0 × 6.0 = 6.0
-    # 内容好但太长: 0 + 1.0 × 0.3 × 6.0 = 1.8
-    # 内容差且太长: 0 + 0.2 × 0.3 × 6.0 = 0.36
+    # Step 3: 总分 = 内容分 × 长度系数 × 缩放
     total = normalized_content * length_multiplier * 6.0
 
     return round(total, 3)
 
 
-def _length_multiplier(response: str) -> float:
+def _relative_length_multiplier(reference: str, response: str) -> float:
     """
-    长度乘法系数: 作为总分的缩放因子，直接控制最终得分
-    最佳区间 (100-300字): 系数 1.0，不打折
-    可接受 (50-100, 300-400字): 系数 0.6-0.8
-    超长/超短: 系数 0.1-0.3，无论内容多好都会被压低
+    相对长度系数: 基于生成长度与参考答案长度的比值
+    和评估函数 compute_length_ratio 的标准一致: 0.3x~3.0x 为合理范围
     """
-    length = len(response)
+    ref_len = len(reference)
+    gen_len = len(response)
+    if ref_len == 0:
+        return _length_multiplier(response)
 
-    if length < 30:
-        return 0.1
-    elif length < 50:
-        return 0.3
-    elif length < 100:
-        return 0.6
-    elif length <= 300:
-        return 1.0
-    elif length <= 400:
+    ratio = gen_len / ref_len
+
+    if ratio < 0.3:
+        return 0.2   # 太短
+    elif ratio < 0.5:
+        return 0.5
+    elif ratio <= 2.0:
+        return 1.0   # 最佳区间
+    elif ratio <= 2.5:
         return 0.7
-    elif length <= 500:
+    elif ratio <= 3.0:
         return 0.4
-    elif length <= 600:
+    elif ratio <= 4.0:
         return 0.2
     else:
-        return 0.1
+        return 0.1   # 严重超长
+
+
+def _similarity_reward(reference: str, response: str) -> float:
+    """
+    相似度奖励: 计算生成回答与参考答案的词级别重叠度
+    和评估函数 compute_rouge_l 的逻辑对齐，直接优化 ROUGE-L 指标
+    """
+    if not reference.strip() or not response.strip():
+        return 0.0
+
+    # 中文 bigram 分词（和 evaluate_model.py 的 _tokenize_chinese 一致）
+    ref_tokens = _tokenize_for_reward(reference)
+    resp_tokens = _tokenize_for_reward(response)
+
+    if not ref_tokens or not resp_tokens:
+        return 0.0
+
+    overlap = ref_tokens & resp_tokens
+    precision = len(overlap) / len(resp_tokens)
+    recall = len(overlap) / len(ref_tokens)
+
+    if precision + recall == 0:
+        return 0.0
+
+    f1 = 2 * precision * recall / (precision + recall)
+
+    # 将 F1 映射到奖励分数: 0~0.15→0, 0.15~0.3→1.0, 0.3~0.5→2.0, 0.5+→3.0
+    if f1 >= 0.5:
+        return 3.0
+    elif f1 >= 0.3:
+        return 2.0
+    elif f1 >= 0.15:
+        return 1.0
+    else:
+        return 0.0
+
+
+def _tokenize_for_reward(text: str) -> set:
+    """简易中文分词: 按字符 bigram 切分，兼顾英文单词完整性"""
+    tokens = []
+    english_buffer = []
+    for char in text:
+        if char.isascii() and char.isalnum():
+            english_buffer.append(char)
+        else:
+            if english_buffer:
+                tokens.append("".join(english_buffer))
+                english_buffer = []
+            if char.strip():
+                tokens.append(char)
+    if english_buffer:
+        tokens.append("".join(english_buffer))
+    # 生成 bigram
+    bigrams = set()
+    for i in range(len(tokens) - 1):
+        bigrams.add(tokens[i] + tokens[i + 1])
+    return set(tokens) | bigrams
 
 
 def _format_reward(response: str) -> float:
@@ -177,23 +244,34 @@ _CORE_KEYWORDS = {
 }
 
 
-def _keyword_reward(prompt: str, response: str) -> float:
+def _keyword_reward(prompt: str, response: str, reference: str = "") -> float:
     """
-    关键词奖励: 动态从问题中提取关键实体 + 核心词表
-    参考 evaluate_model.py 的 _extract_entities_from_text 逻辑
+    关键词奖励: 和评估函数 compute_keyword_hit_rate 逻辑对齐
+    有参考答案时：从参考答案提取实体 + 核心词表中出现在参考答案里的
+    无参考答案时：从 prompt 提取实体 + 核心词表
     """
     score = 0.0
 
-    # 1. 动态提取：从 prompt 中提取关键实体，检查 response 是否覆盖
-    prompt_entities = _extract_entities_from_text(prompt)
-    if prompt_entities:
-        hit_count = sum(1 for entity in prompt_entities if entity in response)
-        hit_rate = hit_count / len(prompt_entities)
-        score += hit_rate * 1.0  # 最高 1.0
+    if reference:
+        # 和评估逻辑一致：核心词表中出现在参考答案里的 + 从参考答案动态提取的实体
+        core_hits_in_ref = {kw for kw in _CORE_KEYWORDS if kw in reference}
+        dynamic_entities = _extract_entities_from_text(reference)
+        all_keywords = core_hits_in_ref | dynamic_entities
 
-    # 2. 核心词表：response 中出现的核心关键词（降低权重，防止堆砌）
-    core_hits = sum(1 for kw in _CORE_KEYWORDS if kw in response)
-    score += min(core_hits * 0.15, 0.5)  # 最高 0.5（从 1.0 降低）
+        if all_keywords:
+            hit_count = sum(1 for kw in all_keywords if kw in response)
+            hit_rate = hit_count / len(all_keywords)
+            score = hit_rate * 1.5  # 最高 1.5
+    else:
+        # 无参考答案时，从 prompt 提取
+        prompt_entities = _extract_entities_from_text(prompt)
+        if prompt_entities:
+            hit_count = sum(1 for entity in prompt_entities if entity in response)
+            hit_rate = hit_count / len(prompt_entities)
+            score += hit_rate * 1.0
+
+        core_hits = sum(1 for kw in _CORE_KEYWORDS if kw in response)
+        score += min(core_hits * 0.15, 0.5)
 
     return min(score, 1.5)
 
@@ -285,6 +363,38 @@ def _information_density_reward(response: str) -> float:
         return -0.5
 
 
+def _fact_hit_reward(reference: str, response: str) -> float:
+    """
+    事实命中率奖励: 和评估函数 compute_fact_hit_rate 逻辑对齐
+    从参考答案中提取关键事实（URL/邮箱/数字+单位/机构/专有名词），
+    检查生成回答是否包含这些事实
+    """
+    if not reference.strip():
+        return 0.0
+
+    facts = set()
+
+    # URL
+    facts.update(re.findall(r'https?://\S+', reference))
+    # 邮箱
+    facts.update(re.findall(r'[\w.]+@[\w.]+', reference))
+    # 数量事实
+    facts.update(re.findall(r'\d{4}年|\d+%|\d+学分|\d+门|\d+人', reference))
+    # 机构/地点
+    facts.update(re.findall(r'(?:任职于|就职于|来自|位于|地址[是为]?)\s*(\S{2,15})', reference))
+    # 引号内的专有名词
+    facts.update(q for q in re.findall(r'[「『"](.*?)[」』"]', reference) if len(q) >= 2)
+
+    if not facts:
+        return 0.0
+
+    hit_count = sum(1 for fact in facts if fact in response)
+    hit_rate = hit_count / len(facts)
+
+    # 映射到奖励: 命中率 × 1.5
+    return round(hit_rate * 1.5, 3)
+
+
 # veRL 要求的入口函数
 def reward_function(data: Dict[str, Any]) -> List[float]:
     """
@@ -312,15 +422,18 @@ if __name__ == '__main__':
     test_cases = [
         {
             'prompt': '中科大软件学院研一选课有什么建议？',
-            'response': '中科大软件学院研一选课建议如下：1）上学期优先修必修课和感兴趣的限选课，最多选18学分；2）下学期补足剩余学分，研一总共需要修满34学分；3）选课前多参考学长学姐的评价，了解课程难度和老师风格；4）注意部分课程有先修要求，提前规划好顺序。建议研一上学期不要选太多课，留出时间适应研究生生活和了解导师的研究方向。'
+            'response': '中科大软件学院研一选课建议如下：1）上学期优先修必修课和感兴趣的限选课，最多选18学分；2）下学期补足剩余学分，研一总共需要修满34学分；3）选课前多参考学长学姐的评价，了解课程难度和老师风格；4）注意部分课程有先修要求，提前规划好顺序。建议研一上学期不要选太多课，留出时间适应研究生生活和了解导师的研究方向。',
+            'reference': '研一选课建议：1）优先修必修课，最多选18学分；2）研一需修满34学分；3）参考学长学姐评价选课；4）注意先修要求。',
         },
         {
             'prompt': '苏高院宿舍条件怎么样？',
-            'response': '还行吧，就那样。'
+            'response': '还行吧，就那样。',
+            'reference': '苏州高等研究院宿舍为4人间，配有独立卫浴、空调、热水器，每层有公共洗衣房。住宿费约1200元/年。',
         },
         {
             'prompt': '科软就业怎么样？',
-            'response': '就业就业就业就业就业就业就业就业就业就业'
+            'response': '就业就业就业就业就业就业就业就业就业就业',
+            'reference': '中科大软件学院就业率超过98%，主要去向为互联网大厂如阿里、腾讯、字节跳动等，平均年薪约30万。',
         },
     ]
 
@@ -329,14 +442,22 @@ if __name__ == '__main__':
     print('=' * 60)
 
     for i, case in enumerate(test_cases):
-        reward = _score_single(case['prompt'], case['response'])
+        ref = case.get('reference', '')
+        reward = _score_single(case['prompt'], case['response'], ref)
         print(f'\n  测试 {i+1}:')
         print(f'    问题: {case["prompt"]}')
         print(f'    回答: {case["response"][:80]}...' if len(case['response']) > 80 else f'    回答: {case["response"]}')
+        if ref:
+            print(f'    参考: {ref[:60]}...' if len(ref) > 60 else f'    参考: {ref}')
         print(f'    奖励: {reward:.2f}')
-        print(f'      长度系数: {_length_multiplier(case["response"]):.2f}')
+        if ref:
+            print(f'      相对长度系数: {_relative_length_multiplier(ref, case["response"]):.2f}')
+            print(f'      相似度: {_similarity_reward(ref, case["response"]):.1f}')
+            print(f'      事实命中: {_fact_hit_reward(ref, case["response"]):.2f}')
+        else:
+            print(f'      绝对长度系数: {_length_multiplier(case["response"]):.2f}')
         print(f'      格式: {_format_reward(case["response"]):.1f}')
-        print(f'      关键词: {_keyword_reward(case["prompt"], case["response"]):.1f}')
+        print(f'      关键词: {_keyword_reward(case["prompt"], case["response"], ref):.1f}')
         print(f'      流畅度: {_fluency_penalty(case["response"]):.1f}')
         print(f'      完整性: {_completeness_reward(case["response"]):.1f}')
         print(f'      信息密度: {_information_density_reward(case["response"]):.1f}')

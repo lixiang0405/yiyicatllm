@@ -99,13 +99,28 @@ def free_gpu_memory():
         torch.cuda.synchronize()
 
 
-def load_prompts(data_path: str) -> List[str]:
-    """从 parquet 或 JSON 文件加载 prompt"""
+def load_prompts(data_path: str) -> Tuple[List[str], dict]:
+    """
+    从 parquet 或 JSON 文件加载 prompt，并构建参考答案映射表
+
+    Returns:
+        prompts: prompt 列表
+        reference_map: {prompt_text: reference_answer} 映射表
+    """
+    reference_map = {}
+
     if data_path.endswith(".json"):
         with open(data_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        prompts = [item["instruction"] for item in data]
-        return prompts
+        prompts = []
+        for item in data:
+            instruction = item["instruction"]
+            prompts.append(instruction)
+            # SFT 格式用 output，DPO 格式用 chosen
+            ref = item.get("output") or item.get("chosen", "")
+            if ref:
+                reference_map[instruction] = ref
+        return prompts, reference_map
     else:
         dataframe = pd.read_parquet(data_path)
         prompts = []
@@ -113,7 +128,42 @@ def load_prompts(data_path: str) -> List[str]:
             messages = json.loads(raw_prompt)
             user_content = messages[0]["content"]
             prompts.append(user_content)
-        return prompts
+        # parquet 没有参考答案，尝试从原始 JSON 数据中加载
+        reference_map = _load_reference_map()
+        return prompts, reference_map
+
+
+def _load_reference_map() -> dict:
+    """
+    从 GRPO 训练数据的原始来源构建 prompt → 参考答案 的映射表
+    数据来源和 prepare_grpo_data.py 一致：new_qa.json + dpo_train_data.json
+    """
+    reference_map = {}
+    data_dir = PROJECT_DIR / "data"
+
+    # 从 SFT 数据加载（instruction → output）
+    sft_path = data_dir / "new_qa.json"
+    if sft_path.exists():
+        with open(sft_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        for item in data:
+            instruction = item.get("instruction", "")
+            ref = item.get("output", "")
+            if instruction and ref:
+                reference_map[instruction] = ref
+
+    # 从 DPO 训练数据加载（instruction → chosen）
+    dpo_path = data_dir / "dpo_train_data.json"
+    if dpo_path.exists():
+        with open(dpo_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        for item in data:
+            instruction = item.get("instruction", "")
+            ref = item.get("chosen", "")
+            if instruction and ref and instruction not in reference_map:
+                reference_map[instruction] = ref
+
+    return reference_map
 
 
 # ============================================
@@ -602,8 +652,8 @@ def main():
 
     # 加载数据
     log("加载训练数据...")
-    all_prompts = load_prompts(args.data)
-    log(f"共 {len(all_prompts)} 条 prompt")
+    all_prompts, reference_map = load_prompts(args.data)
+    log(f"共 {len(all_prompts)} 条 prompt, {len(reference_map)} 条有参考答案")
 
     # 加载 tokenizer（全程共用）
     log("加载 tokenizer...")
@@ -674,12 +724,14 @@ def main():
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump({"responses": all_responses}, f, ensure_ascii=False)
 
-        # 计算所有 reward
+        # 计算所有 reward（传入参考答案用于相似度计算）
         log("\n[Phase 1.5] 计算奖励...")
         all_rewards = []
         for prompt_text, responses in zip(epoch_prompts, all_responses):
             prompt_list = [prompt_text] * len(responses)
-            rewards = compute_reward(prompt_list, responses)
+            ref_answer = reference_map.get(prompt_text, "")
+            ref_list = [ref_answer] * len(responses) if ref_answer else None
+            rewards = compute_reward(prompt_list, responses, references=ref_list)
             all_rewards.append(rewards)
 
         flat_rewards = [r for group in all_rewards for r in group]
