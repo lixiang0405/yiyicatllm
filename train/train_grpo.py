@@ -55,6 +55,12 @@ from reward_function import compute_reward
 # 工具函数
 # ============================================
 
+def free_gpu_memory():
+    """释放 GPU 显存碎片"""
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
 _log_file = None
 
 def init_log_file(output_dir: str):
@@ -376,22 +382,45 @@ def compute_log_probs_batched(
         input_ids, attention_mask = _pad_and_batch(mb_ids, pad_token_id, device)
         max_len = input_ids.shape[1]
 
-        if requires_grad:
-            logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
-        else:
-            with torch.no_grad():
+        try:
+            if requires_grad:
                 logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
+            else:
+                with torch.no_grad():
+                    logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
 
-        # device_map="auto" 时 logits 可能在不同设备上，统一搬到 input_ids 所在设备
-        if logits.device != input_ids.device:
-            logits = logits.to(input_ids.device)
-        mb_log_probs = _extract_response_log_probs(
-            logits, input_ids, mb_ids, mb_starts, max_len
-        )
-        all_log_probs.append(mb_log_probs)
+            # device_map="auto" 时 logits 可能在不同设备上，统一搬到 input_ids 所在设备
+            if logits.device != input_ids.device:
+                logits = logits.to(input_ids.device)
+            mb_log_probs = _extract_response_log_probs(
+                logits, input_ids, mb_ids, mb_starts, max_len
+            )
+            all_log_probs.append(mb_log_probs)
 
-        # 及时释放中间张量
-        del logits, input_ids, attention_mask
+            # 及时释放中间张量
+            del logits, input_ids, attention_mask
+        except torch.cuda.OutOfMemoryError:
+            # OOM 时释放显存，拆成更小的 sub-batch 逐条处理
+            del input_ids, attention_mask
+            free_gpu_memory()
+            print(f"    ⚠️ OOM at batch {batch_idx+1}, 回退到逐条处理", flush=True)
+            for sub_idx in range(len(mb_ids)):
+                sub_ids = [mb_ids[sub_idx]]
+                sub_starts = [mb_starts[sub_idx]]
+                sub_input, sub_mask = _pad_and_batch(sub_ids, pad_token_id, device)
+                sub_max_len = sub_input.shape[1]
+                if requires_grad:
+                    sub_logits = model(input_ids=sub_input, attention_mask=sub_mask).logits
+                else:
+                    with torch.no_grad():
+                        sub_logits = model(input_ids=sub_input, attention_mask=sub_mask).logits
+                if sub_logits.device != sub_input.device:
+                    sub_logits = sub_logits.to(sub_input.device)
+                sub_lp = _extract_response_log_probs(
+                    sub_logits, sub_input, sub_ids, sub_starts, sub_max_len
+                )
+                all_log_probs.append(sub_lp)
+                del sub_logits, sub_input, sub_mask
 
         # 仅在大批量（ref log_prob 阶段）时打印进度，训练阶段不刷屏
         if total_batches > 10 and ((batch_idx + 1) % 50 == 0 or (batch_idx + 1) == total_batches):
@@ -780,7 +809,7 @@ def main():
                 clip_epsilon=args.clip_epsilon,
                 kl_coef=args.kl_coef,
                 max_length=args.max_length,
-                micro_batch_size=8,
+                micro_batch_size=4,
             )
 
             step_count += 1
