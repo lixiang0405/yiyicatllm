@@ -182,9 +182,12 @@ DPO 配置说明（`train/train_dpo.yaml`）：
 |------|-----|------|
 | stage | dpo | DPO 训练模式 |
 | pref_beta | 0.1 | 偏好强度，越大越保守 |
-| adapter_name_or_path | outputs/ustc-qa-lora | 在 SFT 模型基础上继续训练 |
-| learning_rate | 5e-5 | DPO 学习率通常比 SFT 小 |
-| num_train_epochs | 2 | DPO 通常训练轮数较少 |
+| pref_loss | sigmoid | 原始 DPO loss |
+| model_name_or_path | ustc-qa-merged | 在 SFT 合并模型基础上训练 |
+| learning_rate | 1e-5 | DPO 学习率比 SFT 小 |
+| num_train_epochs | 1 | 1 轮即可，避免过拟合 |
+| per_device_train_batch_size | 4 | 每卡 batch size |
+| gradient_accumulation_steps | 2 | 有效 batch = 4×2×2卡 = 16 |
 
 ### Step 4: veRL GRPO 强化学习（推荐）
 
