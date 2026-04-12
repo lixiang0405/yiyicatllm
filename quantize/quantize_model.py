@@ -14,33 +14,55 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, GPTQConfig
 
 
-CALIBRATION_TEXTS = [
-    "中国科学技术大学是一所以前沿科学和高新技术为主的综合性全国重点大学。",
-    "中科大少年班创办于1978年，是中国高等教育改革的一面旗帜。",
-    "量子信息科学是中科大的优势学科之一，潘建伟院士团队在该领域取得了世界领先的成果。",
-    "中科大位于安徽省合肥市，校园环境优美，学术氛围浓厚。",
-    "中科大的计算机科学与技术学科在人工智能、量子计算等方向处于国内前列。",
-    "中科大毕业生深造率常年保持在70%以上，在全国高校中名列前茅。",
-    "中科大拥有合肥微尺度物质科学国家研究中心等多个国家级科研平台。",
-    "中科大的物理学、化学、数学等基础学科实力雄厚，多个学科获评A+。",
-    "中科大研究生院设有多个一级学科博士点，涵盖理学、工学、管理学等领域。",
-    "中科大国家同步辐射实验室是国家大科学装置，为材料科学研究提供重要支撑。",
-    "中科大火灾科学国家重点实验室在火灾防治领域具有国际影响力。",
-    "中科大与中国科学院深度合作，实行科教融合的人才培养模式。",
-    "请介绍一下中国科学技术大学的历史沿革和发展历程。",
-    "中科大在量子通信领域取得了哪些重要突破？请详细说明。",
-    "中科大的本科教育有什么特色？少年班的选拔机制是怎样的？",
-    "请介绍中科大在人工智能和计算机科学方面的研究成果。",
-]
+def load_calibration_texts(data_dir: str = "data", max_texts: int = 128):
+    """从训练数据中加载校准文本，确保校准数据与训练分布一致"""
+    import random
+    data_path = Path(data_dir)
+    texts = []
+
+    # 从 new_qa.json 加载（instruction + output 拼接成完整对话）
+    new_qa_path = data_path / "new_qa.json"
+    if new_qa_path.exists():
+        with open(new_qa_path, "r", encoding="utf-8") as f:
+            for item in json.load(f):
+                question = item.get("instruction", "")
+                answer = item.get("output", "")
+                if question and answer:
+                    texts.append(f"问：{question}\n答：{answer}")
+
+    # 从 preference_data.json 加载（instruction + chosen）
+    pref_path = data_path / "preference_data.json"
+    if pref_path.exists():
+        with open(pref_path, "r", encoding="utf-8") as f:
+            for item in json.load(f):
+                question = item.get("instruction", "")
+                answer = item.get("chosen", "")
+                if question and answer:
+                    texts.append(f"问：{question}\n答：{answer}")
+
+    if not texts:
+        raise FileNotFoundError(
+            f"在 {data_dir} 下未找到 new_qa.json 或 preference_data.json，"
+            "请确保训练数据文件存在"
+        )
+
+    # 去重后随机采样
+    texts = list(set(texts))
+    random.seed(42)
+    random.shuffle(texts)
+    sampled = texts[:max_texts]
+    print(f"[校准数据] 共加载 {len(texts)} 条，采样 {len(sampled)} 条")
+    return sampled
 
 
-def prepare_calibration_dataset(tokenizer, num_samples: int = 128, max_length: int = 512):
-    """准备校准数据集，返回 tokenizer 编码后的文本列表"""
-    repeated_texts = (CALIBRATION_TEXTS * ((num_samples // len(CALIBRATION_TEXTS)) + 1))[:num_samples]
+def prepare_calibration_dataset(tokenizer, data_dir: str = "data",
+                                num_samples: int = 128, max_length: int = 512):
+    """准备校准数据集，从真实训练数据中采样"""
+    calibration_texts = load_calibration_texts(data_dir, max_texts=num_samples)
     return [
         tokenizer(text, return_tensors="pt", padding="max_length",
                   truncation=True, max_length=max_length)["input_ids"].squeeze(0)
-        for text in repeated_texts
+        for text in calibration_texts
     ]
 
 
