@@ -40,58 +40,61 @@ def compute_reward(
 
 
 def _score_single(prompt: str, response: str) -> float:
-    """对单个回答计算综合奖励分数"""
-    score = 0.0
-
-    # 1. 长度奖励 (max 2.0, min -5.0) — 权重最高，强力约束长度
-    score += _length_reward(response)
-
-    # 2. 格式奖励 (max 2.0)
-    score += _format_reward(response)
-
-    # 3. 关键词奖励 (max 1.5) — 降低权重，防止堆砌关键词
-    score += _keyword_reward(prompt, response)
-
-    # 4. 流畅度惩罚 (max -3.0)
-    score += _fluency_penalty(response)
-
-    # 5. 完整性奖励 (max 1.0)
-    score += _completeness_reward(response)
-
-    # 6. 信息密度奖励 (max 1.0) — 鼓励简洁有效的回答
-    score += _information_density_reward(response)
-
-    return score
-
-
-def _length_reward(response: str) -> float:
     """
-    长度奖励: 强力鼓励 100-300 字的回答，严厉惩罚超长回答
-    太短 (<50): 信息不足
-    适中 (100-300): 最佳
-    稍长 (300-500): 惩罚
-    太长 (>500): 重度惩罚，越长惩罚越重
+    对单个回答计算综合奖励分数
+
+    采用乘法结构：总分 = 内容分 × 长度系数
+    这样长度异常时无论内容多好，总分都会被压低，防止 reward hacking
+    """
+    # Step 1: 计算内容质量分（加法，各维度独立）
+    content_score = 0.0
+    content_score += _format_reward(response)           # max 2.0
+    content_score += _keyword_reward(prompt, response)  # max 1.5
+    content_score += _completeness_reward(response)     # max 1.0
+    content_score += _information_density_reward(response)  # max 1.0
+    content_score += _fluency_penalty(response)         # max 0, min -3.0
+    # content_score 范围: [-3.0, 5.5]
+
+    # 归一化到 [0, 1] 区间，方便乘法
+    normalized_content = max(0.0, (content_score + 3.0) / 8.5)  # -3→0, 5.5→1.0
+
+    # Step 2: 计算长度系数（乘法，直接缩放总分）
+    length_multiplier = _length_multiplier(response)  # [0.0, 1.0]
+
+    # Step 3: 总分 = 基础分 + 内容分 × 长度系数 × 缩放
+    # 最佳情况: 0 + 1.0 × 1.0 × 6.0 = 6.0
+    # 内容好但太长: 0 + 1.0 × 0.3 × 6.0 = 1.8
+    # 内容差且太长: 0 + 0.2 × 0.3 × 6.0 = 0.36
+    total = normalized_content * length_multiplier * 6.0
+
+    return round(total, 3)
+
+
+def _length_multiplier(response: str) -> float:
+    """
+    长度乘法系数: 作为总分的缩放因子，直接控制最终得分
+    最佳区间 (100-300字): 系数 1.0，不打折
+    可接受 (50-100, 300-400字): 系数 0.6-0.8
+    超长/超短: 系数 0.1-0.3，无论内容多好都会被压低
     """
     length = len(response)
 
     if length < 30:
-        return -2.0
+        return 0.1
     elif length < 50:
-        return -0.5
+        return 0.3
     elif length < 100:
-        return 0.5
+        return 0.6
     elif length <= 300:
-        return 2.0
+        return 1.0
     elif length <= 400:
-        return 0.0
+        return 0.7
     elif length <= 500:
-        return -1.5
+        return 0.4
     elif length <= 600:
-        return -2.5
+        return 0.2
     else:
-        # 超过 600 字，每多 100 字多扣 0.5，最多扣到 -5.0
-        extra_penalty = min((length - 600) / 100 * 0.5, 2.5)
-        return -2.5 - extra_penalty
+        return 0.1
 
 
 def _format_reward(response: str) -> float:
@@ -331,7 +334,7 @@ if __name__ == '__main__':
         print(f'    问题: {case["prompt"]}')
         print(f'    回答: {case["response"][:80]}...' if len(case['response']) > 80 else f'    回答: {case["response"]}')
         print(f'    奖励: {reward:.2f}')
-        print(f'      长度: {_length_reward(case["response"]):.1f}')
+        print(f'      长度系数: {_length_multiplier(case["response"]):.2f}')
         print(f'      格式: {_format_reward(case["response"]):.1f}')
         print(f'      关键词: {_keyword_reward(case["prompt"], case["response"]):.1f}')
         print(f'      流畅度: {_fluency_penalty(case["response"]):.1f}')
