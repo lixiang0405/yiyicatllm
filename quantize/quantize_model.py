@@ -17,7 +17,10 @@ if "torchvision" not in sys.modules:
     _tv.__spec__ = importlib.util.spec_from_loader("torchvision", loader=None)
     _tvt = types.ModuleType("torchvision.transforms")
     _tvt.__spec__ = importlib.util.spec_from_loader("torchvision.transforms", loader=None)
-    _tvt.InterpolationMode = type("InterpolationMode", (), {"BILINEAR": 2, "BICUBIC": 3, "NEAREST": 0})
+    _tvt.InterpolationMode = type("InterpolationMode", (), {
+        "BILINEAR": 2, "BICUBIC": 3, "NEAREST": 0, "NEAREST_EXACT": 0,
+        "BOX": 4, "HAMMING": 5, "LANCZOS": 1,
+    })
     _tv.transforms = _tvt
     sys.modules["torchvision"] = _tv
     sys.modules["torchvision.transforms"] = _tvt
@@ -83,20 +86,43 @@ def prepare_calibration_dataset(tokenizer, data_dir: str = "data",
 
 
 def quantize_gptq_native(model_path: str, output_path: str, bits: int = 4):
-    """使用 transformers 原生 GPTQConfig 进行量化（无需 auto-gptq）"""
+    """使用 GPTQ 进行量化，自动选择可用的后端"""
     print(f"[GPTQ] 加载 tokenizer: {model_path}")
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     print(f"[GPTQ] 准备校准数据...")
-    calibration_dataset = prepare_calibration_dataset(tokenizer)
+    calibration_texts = load_calibration_texts(max_texts=128)
+
+    # 先修复 optimum 的 QuantizeConfig 缺失 bug
+    try:
+        import optimum.gptq.quantizer as _oq
+        if not hasattr(_oq, 'QuantizeConfig'):
+            from dataclasses import dataclass
+            @dataclass
+            class _FakeQuantizeConfig:
+                bits: int = 4
+                group_size: int = 128
+                damp_percent: float = 0.1
+                desc_act: bool = True
+                static_groups: bool = False
+                sym: bool = True
+                true_sequential: bool = True
+                model_name_or_path: str = None
+                model_file_base_name: str = None
+                is_marlin_format: bool = False
+                quant_method: str = "gptq"
+            _oq.QuantizeConfig = _FakeQuantizeConfig
+            print("[GPTQ] 已修复 optimum QuantizeConfig 缺失")
+    except Exception:
+        pass
 
     gptq_config = GPTQConfig(
         bits=bits,
         group_size=128,
         desc_act=True,
-        dataset=calibration_dataset,
+        dataset=calibration_texts,
         tokenizer=tokenizer,
         damp_percent=0.1,
     )
@@ -106,7 +132,7 @@ def quantize_gptq_native(model_path: str, output_path: str, bits: int = 4):
         model_path,
         quantization_config=gptq_config,
         trust_remote_code=True,
-        torch_dtype=torch.float16,
+        dtype=torch.float16,
         device_map="auto",
     )
 
