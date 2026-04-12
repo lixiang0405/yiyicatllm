@@ -6,25 +6,21 @@
 依赖：transformers, optimum, torch
 """
 
-# 绕过 torchvision CUDA 版本检查：量化语言模型不需要 torchvision，
-# 但 transformers 的 import 链条会拖进来导致 CUDA 版本不匹配报错
-import importlib
+# 绕过 torchvision CUDA 版本检查（量化语言模型不需要 torchvision）
 import importlib.util
 import sys
 import types
 
 if "torchvision" not in sys.modules:
-    fake_tv = types.ModuleType("torchvision")
-    fake_tv.__version__ = "0.25.0"
-    fake_tv.__spec__ = importlib.util.spec_from_loader("torchvision", loader=None)
-    fake_transforms = types.ModuleType("torchvision.transforms")
-    fake_transforms.__spec__ = importlib.util.spec_from_loader("torchvision.transforms", loader=None)
-    fake_transforms.InterpolationMode = type("InterpolationMode", (), {
-        "BILINEAR": 2, "BICUBIC": 3, "NEAREST": 0,
-    })
-    fake_tv.transforms = fake_transforms
-    sys.modules["torchvision"] = fake_tv
-    sys.modules["torchvision.transforms"] = fake_transforms
+    _tv = types.ModuleType("torchvision")
+    _tv.__version__ = "0.25.0"
+    _tv.__spec__ = importlib.util.spec_from_loader("torchvision", loader=None)
+    _tvt = types.ModuleType("torchvision.transforms")
+    _tvt.__spec__ = importlib.util.spec_from_loader("torchvision.transforms", loader=None)
+    _tvt.InterpolationMode = type("InterpolationMode", (), {"BILINEAR": 2, "BICUBIC": 3, "NEAREST": 0})
+    _tv.transforms = _tvt
+    sys.modules["torchvision"] = _tv
+    sys.modules["torchvision.transforms"] = _tvt
 
 import argparse
 import json
